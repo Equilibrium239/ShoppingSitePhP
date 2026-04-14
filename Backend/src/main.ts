@@ -3,10 +3,15 @@ import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import cors from "cors";
 import http from 'http';
+import ProductRouter from "./Routes/Product.route";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 app.use(cors());
+
+
+
+app.use("/api/items", ProductRouter);
 
 app.get ("/", (req: Request, res: Response) => {
     res.send("Hello World!");
