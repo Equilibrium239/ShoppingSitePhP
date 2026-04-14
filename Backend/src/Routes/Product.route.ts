@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getAllProducts, getProductByID, updateProduct } from "../models/Products";
+import { deleteProduct, getAllProducts, getProductByID, updateProduct } from "../models/Products";
 
 
 const ProductRouter = Router();
@@ -37,6 +37,12 @@ ProductRouter.put("/:id", async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({message: "Something When Wrong" });
     }
+});
+
+ProductRouter.delete("/:id", async (req: Request, res: Response) => {
+    const prductId = parseInt(req.params.id as string);
+    await deleteProduct(prductId);
+    res.status(204).send();
 });
 
 
