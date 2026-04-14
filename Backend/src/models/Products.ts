@@ -28,7 +28,15 @@ export async function updateProduct(
     Product: {name: string; size: string; img: string; price: number}
 ): Promise<Product | null> {
     let conn = await connection;
-    await conn.query
-    ("UPDATE Cloths.Inventory SET name = ?, size = ?, img = ?, price = ? WHERE id = ?;", [Product.name, Product.size, Product.img, Product.price, id]);
-    return await getProductByID(id);
+     await conn.query
+    ("UPDATE Shopping.Inventory SET name = ?, size = ?, img = ?, price = ? WHERE id = ?;", [Product.name, Product.size, Product.img, Product.price, id]);
+
+    const updatedProduct = await getProductByID(id);
+    return updatedProduct;
+}
+
+export async function deleteProduct(id: number) : Promise<void> {
+    let conn = await connection;
+    await conn.query("DELETE FROM Shopping.Inventory WHERE id = ?", [id]);
+    
 }
