@@ -12,7 +12,7 @@
 <body>
     <h2>bli Medlem</h2>
 
-    <form action="register.php" method="POST">
+    <form action="Register.php" method="POST">
         <label for="name">Namn:</label><br>
         <input type="text" id="name" name="name" required><br><br>
 
