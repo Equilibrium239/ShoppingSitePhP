@@ -1,3 +1,39 @@
+<?php 
+
+    $host = 'localhost';
+    $dbname = 'Shopping';
+    $user = 'root';
+    $password = '';
+
+    $conn = new mysqli($host, $user, $password, $dbname);
+
+    if ($conn->connect_error) {
+        die("Connection failed" . $conn->connect_error);
+    }
+
+    $username = $_POST['name'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?,?,?)");
+    $stmt->bind_param("sss", $username, $email, $hashedPassword);
+
+    if ($stmt->execute()) {
+        echo "Välkommen, " . $username . "Du är nu en Medlem!";
+    } else {
+        echo "Ett fel uppstod" . $stmt->error;
+    }
+
+
+    $stmt->close();
+    $conn->close();
+
+
+
+?>
+
 
 
 
