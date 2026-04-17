@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bli Medlem</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="my-app/src/style.css">
     <style>
 
     body {
@@ -67,20 +67,58 @@
     box-shadow: 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
-.btn-link {
-    display: block;
-    text-align: center;
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
     background-color: #007bff;
     color: white;
-    text-decoration: none;
-    font-weight: 600;
-    padding: 12px;
+    border: none;
     border-radius: 8px;
-    transition: background-color 0.3s ease;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.form-footer {
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-top: 10px;
+}
+
+.form-footer p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+
+.btn-link {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .btn-link:hover {
-    background-color: gray;
+    text-decoration: underline;
+}
+
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px; 
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
 }
 
 </style>
@@ -99,7 +137,12 @@
         <label for="password" class="form-label">Lösenord:</label><br>
         <input type="password" id="password" name="password" class="form-input" required><br><br>
 
-         <a href="/components/Register.php" class="btn-link">Registrera</a>
+        <button type="submit" class="btn-primary">Logga in</button>
+
+        <div>
+            <p>Inte medlem än?</p>
+            <a href="/components/Register.php" class="btn-link">Registrera dig här</a>
+        </div>
 
       </form>
     </div>
