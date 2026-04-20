@@ -141,7 +141,7 @@
 
         <div>
             <p>Inte medlem än?</p>
-            <a href="/components/Register.php" class="btn-link">Registrera dig här</a>
+            <a href="Register.php" class="btn-link">Registrera dig här</a>
         </div>
 
       </form>

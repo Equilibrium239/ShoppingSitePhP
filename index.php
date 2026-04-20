@@ -36,7 +36,7 @@ $pageTitle = "Welcome to our store!";
         <div class="hero-content">
             <h1>Uppgradera din garderob</h1>
             <p>Utforska våra senaste kollektioner</p>
-            <a href="component/Cloths.php" class="Btn">Handla nu</a>
+            <a href="my-app/components/Cloths.php" class="Btn">Handla nu</a>
         </div>
     </main>
 
