@@ -12,3 +12,5 @@ $database = new Database();
 
 ?>
 
+
+<h1>Du har tryckt på <?php echo $id; ?>:</h1>

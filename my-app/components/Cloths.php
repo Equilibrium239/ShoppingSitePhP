@@ -164,7 +164,7 @@
                 <img src="my-app/image/<?php echo $product['imageUrl']; ?>" alt="<?php echo $product['name']; ?>">
             </div>
             <div class="product-info">
-                <h3><a href="my-app/components/Product.php?id=<?php echo $product['id']; ?>">
+                <h3><a href="Product.php?id=<?php echo $product['id']; ?>">
                     <?php echo $product['name']; ?>
                 </h3></a>
                 <p class="description" style="font-size: 0.8rem; color: #666;"><?php echo $product['description']; ?></p>
