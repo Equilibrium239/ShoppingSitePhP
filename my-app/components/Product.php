@@ -2,17 +2,16 @@
 
 require_once(__DIR__ . '/../Models/Database.php');
 
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+if (!isset($_GET['id'])) {
+    die("Ingen ID angavs.");  
+}
 
-    $database = new Database();
-    $product = $database->getProduct($id);
+$id = $_GET['id'];
+$database = new Database();
+$product = $database->getProduct($id);
 
-    if (!$product) {
-        die("Produkt inte hittad");
-    } else {
-        die("Ingen ID angavs.");
-    }
+if (!$product) {
+    die("Produkt inte hittad.");  
 }
 
 ?>

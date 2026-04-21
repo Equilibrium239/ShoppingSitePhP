@@ -29,7 +29,7 @@ class Database {
         }
     }
 
-    // Hämtar alla produkter från tabellen Shopping.Inventory
+    // Hämtar alla produkter 
     function getAllProducts($sortCol = "id", $sortOrder = "asc"){
         $validCols = ["id", "name", "size", "price"];
         if(!in_array($sortCol, $validCols)){
@@ -37,19 +37,19 @@ class Database {
         }
         $sortOrder = ($sortOrder === "desc") ? "desc" : "asc";
 
-        // Vi använder namnet 'Inventory' som syns i dina TS-filer
+        
         $query = $this->pdo->query("SELECT * FROM Inventory ORDER BY $sortCol $sortOrder");
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Hämtar en specifik produkt baserat på ID
+    // specifik produkt baserat på ID
     function getProduct($id){
         $query = $this->pdo->prepare("SELECT * FROM Inventory WHERE id = :id");
         $query->execute(['id' => $id]);
         return $query->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Uppdaterar en produkt (matchar din updateProduct i Products.ts)
+    // Uppdaterar en produkt
     function updateProduct($id, $name, $size, $img, $price) {
         $sql = "UPDATE Inventory SET name = ?, size = ?, img = ?, price = ? WHERE id = ?";
         $query = $this->pdo->prepare($sql);
