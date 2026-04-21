@@ -16,6 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cloths</title>
     <link rel="stylesheet" href="my-app/src/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 
@@ -136,7 +137,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="my-app/components/Medlemskap.php">
+                    <a href="Medlemskap.php">
                         <button class="Btn">Medlem</button>
                     </a>
                 </li>

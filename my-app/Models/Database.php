@@ -11,11 +11,11 @@ class Database {
 
     function __construct() {    
         
-        $host = $_ENV['DB_HOST'];
-        $db   = $_ENV['DB_DATABASE'];
-        $user = $_ENV['DB_USERNAME'];
-        $pass = $_ENV['DB_PASSWORD'];
-        $port = $_ENV['DB_PORT'];
+        $host = "localhost";
+        $db   = "Shopping";
+        $user = "root";
+        $pass = "root";
+        $port = "3306";
 
         $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4"; 
         
@@ -23,7 +23,7 @@ class Database {
             $this->pdo = new PDO($dsn, $user, $pass);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            $this->usersDatabase = new UserDatabase($this->pdo);
+            //$this->usersDatabase = new UserDatabase($this->pdo);
         } catch (PDOException $e) {
             die("Anslutning misslyckades: " . $e->getMessage());
         }
