@@ -16,9 +16,9 @@ $pageTitle = "Welcome to our store!";
     <header class="main-header">
         <nav class="navbar">
             <ul class="nav-menu">
-                <li><a href="component/Cloths.php" class="nav-link">Cloths</a></li>
+                <li><a href="my-app/components/Cloths.php" class="nav-link">Cloths</a></li>
                 <li>
-                    <a href="cart.php" class="cart-wrapper">
+                    <a href="my-app/components/Cart.php" class="cart-wrapper">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="cart counter">0</span>
                     </a>
