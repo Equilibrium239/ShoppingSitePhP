@@ -9,8 +9,6 @@
 
 
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,12 +42,12 @@
         <div class="product-grid">
     <?php 
     $my_products = [
-        ['name' => 'Levis', 'size' => 'S', 'description' => 'stylish jean from Levis', 'imageUrl' => 'Levis Jeans.jpg', 'price' => '1000.00'],
-        ['name' => 'Napapijri', 'size' => 'XL', 'description' => 'stylish jacket from Napapijri', 'imageUrl' => 'Napapijri Jacket.jpg', 'price' => '3000.00'],
-        ['name' => 'Obey', 'size' => 'M', 'description' => 'Simple stylish look for an everyday use from obey', 'imageUrl' => 'Obey Hoodie.jgp', 'price' => '800.00'],
-        ['name' => 'Nike Air Force', 'size' => '43', 'description' => 'An everyday shoe from nike', 'imageUrl' => 'Nike Air Force.jgp', 'price' => '1500.00'],
-        ['name' => 'Supreme', 'size' => 'L', 'description' => 'An simepl looking t-shirt from Supreme for an ev...', 'imageUrl' => 'Supreme T-shirt.jgp', 'price' => '1200.00'],
-        ['name' => 'Replay', 'size' => 'L', 'description' => 'Looking for an italien brand and not brake the b...', 'imageUrl' => 'Replay Jean.jgp', 'price' => '2000.00']
+        ['name' => 'Levis', 'size' => 'S', 'description' => 'stylish jean from Levis', 'imageUrl' => 'Levis Jeans.jpg', 'price' => '100.00'],
+        ['name' => 'Napapijri', 'size' => 'XL', 'description' => 'stylish jacket from Napapijri', 'imageUrl' => 'Napapijri Jacket.jpg', 'price' => '300.00'],
+        ['name' => 'Obey', 'size' => 'M', 'description' => 'Simple stylish look for an everyday use from obey', 'imageUrl' => 'Obey Hoodie.jpg', 'price' => '80.00'],
+        ['name' => 'Nike Air Force', 'size' => '43', 'description' => 'An everyday shoe from nike', 'imageUrl' => 'Nike Air Force.jpg', 'price' => '150.00'],
+        ['name' => 'Supreme', 'size' => 'L', 'description' => 'An simepl looking t-shirt from Supreme for an ev...', 'imageUrl' => 'Supreme T-shirt.jpg', 'price' => '120.00'],
+        ['name' => 'Replay', 'size' => 'L', 'description' => 'Looking for an italien brand and not brake the b...', 'imageUrl' => 'Replay Jean.jpg', 'price' => '200.00']
     ];
 
       foreach ($my_products as $product): ?>
@@ -62,7 +60,7 @@
                 <p class="description" style="font-size: 0.8rem; color: #666;"><?php echo $product['description']; ?></p>
                 <p class="size">Storlek: <?php echo $product['size']; ?></p>
                 <p class="price"><?php echo $product['price']; ?> USD</p>
-                <button class="Btn">Lägg i varukorg</button>
+                <button class="BtnCloths">Lägg i varukorg</button>
             </div>
         </div>
     <?php endforeach; ?>
