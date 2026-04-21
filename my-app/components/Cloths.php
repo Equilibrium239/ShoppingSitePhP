@@ -161,7 +161,7 @@
       foreach ($my_products as $product): ?>
         <div class="product-card">
             <div class="product-image">
-                <img src="my-app/image/<?php echo $product['imageUrl']; ?>" alt="<?php echo $product['name']; ?>">
+                <img src="/my-app/image/<?php echo $product['imageUrl']; ?>" alt="<?php echo $product['name']; ?>">
             </div>
             <div class="product-info">
                 <h3><a href="Product.php?id=<?php echo $product['id']; ?>">
