@@ -1,6 +1,8 @@
 <?php 
 require_once(__DIR__ . '/Product.php');
-require_once("vendor/autoload.php");
+require_once(__DIR__ . '/../Models/Database.php');
+require_once(__DIR__ . '/../Models/UserDatabase.php');
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Database {
     public $pdo;
@@ -11,6 +13,10 @@ class Database {
     }        
 
     function __construct() {    
+    
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+        $dotenv->load();
+
         
         $host = "localhost";
         $db   = "Shopping";
