@@ -157,6 +157,10 @@
                 <img src="/my-app/image/<?php echo $product['imageUrl']; ?>" alt="<?php echo $product['name']; ?>">
             </div>
             <div class="product-info">
+                <span class="category-badge" style="font-size: 0.7rem; text-transform: uppercase; color: #888;">
+                <?php echo $product['category_name'] ?? 'Okategoriserad'; ?>
+
+
                 <h3><a href="Product.php?id=<?php echo $product['id']; ?>">
                     <?php echo $product['name']; ?>
                 </h3></a>
