@@ -49,6 +49,13 @@ class Database {
         return $query->fetch(PDO::FETCH_ASSOC);
     }
 
+    function getPopularProducts($limit = 4) {
+        $query = $this->pdo->prepare("SELECT * FROM Inventory ORDER BY likes DESC LIMIT :limit");
+        $query->bindValue(':limit',(int)$limit, PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // Uppdaterar en produkt
     function updateProduct($id, $name, $size, $img, $price) {
         $sql = "UPDATE Inventory SET name = ?, size = ?, img = ?, price = ? WHERE id = ?";

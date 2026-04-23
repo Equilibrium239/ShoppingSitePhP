@@ -4,6 +4,8 @@
     $db = new Database();
 
     $my_products = $db->getAllProducts();
+
+    $popular_products = $db->getPopularProducts();
 ?>
 
 
