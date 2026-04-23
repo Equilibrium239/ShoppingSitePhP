@@ -39,10 +39,48 @@ if (!$product) {
             color: green;
             font-size: 1.5rem;
         }
+
+        .back-btn {
+             display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .back-btn:hover {
+            background-color: #218839;
+            color: white;
+        }
+
+        .cart-btn {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .cart-btn:hover {
+            background-color: #218839;
+            color: white;
+        }
     </style>
 <body>
 
-    <a href="../Cloths.php">Tillbaka till kläder</a>
+    <a href="../components/Cloths.php" class="back-btn">Tillbaka till kläder</a>
 
     <div class="product-detail">
         <div class="image-section">
@@ -54,7 +92,7 @@ if (!$product) {
             <p><strong>Storlek:</strong> <?php echo $product['size']; ?></p>
             <p><strong>Beskrivning:</strong> <?php echo $product['description']; ?></p>
             <p class="price"><?php echo $product['price']; ?> USD</p>
-            <button>Lägg i varukorg</button>
+            <a href="../components/Cart.php" class="cart-btn">Lägg i varukorg</a>
 
         </div>
 
