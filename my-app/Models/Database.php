@@ -1,5 +1,6 @@
 <?php 
 require_once(__DIR__ . '/Product.php');
+require_once("vendor/autoload.php");
 
 class Database {
     public $pdo;
