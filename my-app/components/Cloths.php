@@ -1,9 +1,9 @@
 <?php 
-    $api_url = "http://localhost:3000/api/items";
+    require_once(__DIR__ . '/../Models/Database.php');
 
-    $response = file_get_contents($api_url);
+    $db = new Database();
 
-    $products = json_decode($response, true);
+    $my_products = $db->getAllProducts();
 ?>
 
 
@@ -150,15 +150,6 @@
 
         <div class="product-grid">
     <?php 
-    $my_products = [
-        ['id' => 1, 'name' => 'Levis', 'size' => 'S', 'description' => 'stylish jean from Levis', 'imageUrl' => 'Levis Jeans.jpg', 'price' => '100.00'],
-        ['id' => 2, 'name' => 'Napapijri', 'size' => 'XL', 'description' => 'stylish jacket from Napapijri', 'imageUrl' => 'Napapijri Jacket.jpg', 'price' => '300.00'],
-        ['id' => 3, 'name' => 'Obey', 'size' => 'M', 'description' => 'Simple stylish look for an everyday use from obey', 'imageUrl' => 'Obey Hoodie.jpg', 'price' => '80.00'],
-        ['id' => 4, 'name' => 'Nike Air Force', 'size' => '43', 'description' => 'An everyday shoe from nike', 'imageUrl' => 'Nike Air Force.jpg', 'price' => '150.00'],
-        ['id' => 5, 'name' => 'Supreme', 'size' => 'L', 'description' => 'An simepl looking t-shirt from Supreme for an ev...', 'imageUrl' => 'Supreme T-shirt.jpg', 'price' => '120.00'],
-        ['id' => 6, 'name' => 'Replay', 'size' => 'L', 'description' => 'Looking for an italien brand and not brake the b...', 'imageUrl' => 'Replay Jean.jpg', 'price' => '200.00']
-    ];
-
       foreach ($my_products as $product): ?>
         <div class="product-card">
             <div class="product-image">
