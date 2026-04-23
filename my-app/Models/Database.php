@@ -3,6 +3,7 @@ require_once(__DIR__ . '/Product.php');
 require_once(__DIR__ . '/../Models/Database.php');
 require_once(__DIR__ . '/../Models/UserDatabase.php');
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once(__DIR__ . '/../Models/Category.php');
 
 class Database {
     public $pdo;
@@ -54,6 +55,17 @@ class Database {
         $query = $this->pdo->prepare("SELECT * FROM Inventory WHERE id = :id");
         $query->execute(['id' => $id]);
         return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    function getAllCategories(){
+        $query = $this->pdo->query("SELECT * FROM categories");
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function getProductByCategory($categoryid) {
+        $query = $this->pdo->prepare("SELECT * FROM Inventory WHERE category_id = :catId");
+        $query->execute(["catId" => $categoryid]);
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
     function getPopularProducts($limit = 4) {
