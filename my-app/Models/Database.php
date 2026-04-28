@@ -86,10 +86,10 @@ class Database {
     }
 
     // Uppdaterar en produkt
-    function updateProduct($id, $name, $size, $img, $price) {
+    function updateProduct($id, $name, $size, $description, $imageUrl, $price, $category_id) {
         $sql = "UPDATE Inventory SET name = ?, size = ?, img = ?, price = ? WHERE id = ?";
         $query = $this->pdo->prepare($sql);
-        $query->execute([$name, $size, $img, $price, $id]);
+        $query->execute([$name, $size, $description, $imageUrl, $price, $category_id]);
     }
 
     public function addProduct($name, $size, $description, $imageUrl, $price, $category_id) {
