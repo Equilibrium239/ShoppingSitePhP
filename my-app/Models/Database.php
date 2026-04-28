@@ -46,7 +46,7 @@ class Database {
         $sortOrder = ($sortOrder === "desc") ? "desc" : "asc";
 
         
-        $query = $this->pdo->query("SELECT * FROM Inventory ORDER BY $sortCol $sortOrder");
+        $query = $this->pdo->query("SELECT Inventory.*, categories.category_name FROM Inventory JOIN categories ON Inventory.category_id = categories.id ORDER BY $sortCol $sortOrder");
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -57,17 +57,20 @@ class Database {
         return $query->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Hämtar alla kategorier
     function getAllCategories(){
         $query = $this->pdo->query("SELECT * FROM categories");
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Hämtar produkter baserat på kategori
     function getProductByCategory($categoryid) {
         $query = $this->pdo->prepare("SELECT * FROM Inventory WHERE category_id = :catId");
         $query->execute(["catId" => $categoryid]);
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Hämtar de mest populära produkterna baserat på antal likes
     function getPopularProducts($limit = 4) {
         $query = $this->pdo->prepare("SELECT * FROM Inventory ORDER BY likes DESC LIMIT :limit");
         $query->bindValue(':limit',(int)$limit, PDO::PARAM_INT);
@@ -75,11 +78,24 @@ class Database {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    //hämtar admin baserat på användarnamn
+    public function getAdmin($username) {
+        $stmt = $this->pdo->prepare("SELECT * FROM admin WHERE username = :username");
+        $stmt->execute(['username' => $username]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     // Uppdaterar en produkt
     function updateProduct($id, $name, $size, $img, $price) {
         $sql = "UPDATE Inventory SET name = ?, size = ?, img = ?, price = ? WHERE id = ?";
         $query = $this->pdo->prepare($sql);
         $query->execute([$name, $size, $img, $price, $id]);
+    }
+
+    public function addProduct($name, $size, $description, $imageUrl, $price, $category_id) {
+        $sql = "INSERT INTO Inventory (name, size, description, imageUrl, price, category_id) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$name, $size, $description, $imageUrl, $price, $category_id]);
     }
 
     // Tar bort en produkt
