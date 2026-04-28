@@ -63,7 +63,7 @@ class Database {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Hämtar produkter baserat på kategori
+    // Hämtar produkter baserat på kategori id
     function getProductByCategory($categoryid) {
         $query = $this->pdo->prepare("SELECT * FROM Inventory WHERE category_id = :catId");
         $query->execute(["catId" => $categoryid]);
