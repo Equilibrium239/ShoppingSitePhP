@@ -6,6 +6,89 @@
     <title>Register</title>
     <link rel="stylesheet" href="my-app/src/style.css">
 </head>
+<style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 1.8rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+
+        
+        .msg-success { color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; }
+        .msg-error { color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; }
+
+        .login-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .login-link:hover { text-decoration: underline; }
+    </style>
 <body>
     <div class="box">
         <h2>Registrera</h2>
