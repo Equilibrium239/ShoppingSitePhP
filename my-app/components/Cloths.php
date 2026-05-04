@@ -167,7 +167,9 @@
                 <p class="description" style="font-size: 0.8rem; color: #666;"><?php echo $product['description']; ?></p>
                 <p class="size">Storlek: <?php echo $product['size']; ?></p>
                 <p class="price"><?php echo $product['price']; ?> USD</p>
-                <button class="BtnCloths">Lägg i varukorg</button>
+                <a href="cart.php?action=add&id=<?php echo $product['id']; ?>" class="BtnCloths">
+                    Lägg i varukorg
+                </a>
             </div>
         </div>
     <?php endforeach; ?>
