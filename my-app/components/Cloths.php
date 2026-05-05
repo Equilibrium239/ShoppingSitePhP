@@ -22,8 +22,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-
-
 <style>
      .product-grid {
         display: grid;
@@ -129,27 +127,7 @@
 </style>
 
 <body>
-    <header class="main-header">
-        <nav class="navbar">
-            <ul class="nav-menu">
-                <li>
-                    <a href="cart.php" class="cart-wrapper">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span class="cart counter">
-                        <?php 
-                            echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; 
-                        ?>
-                    </span>
-                    </a>
-                </li>
-                <li>
-                    <a href="Medlemskap.php">
-                        <button class="Btn">Medlem</button>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </header>
+    <?php require_once(__DIR__ . '/header.php'); ?>
 
     <main class="container">
         <h1>Sortiment</h1>
