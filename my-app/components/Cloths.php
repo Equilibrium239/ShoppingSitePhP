@@ -4,8 +4,11 @@
 
     $db = new Database();
 
-    $my_products = $db->getAllProducts();
+    $category = isset($_GET['category']) ? $_GET['category'] : null;
+    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 
+    $my_products = $db->getAllProducts();
+    $my_products = $db->getProductsFilterd($category, $sort);
     $popular_products = $db->getPopularProducts();
 ?>
 
@@ -128,6 +131,21 @@
 
 <body>
     <?php require_once(__DIR__ . '/header.php'); ?>
+
+    <div class="sorting-container">
+        <form method="GET" action="Cloths.php">
+            <?php if ($category): ?>
+                <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
+            <?php endif; ?>
+
+            <select name="sort" onchange="this.form.submit()" class="BTN">
+                <option value="default" <?php echo $sort == 'default' ? 'selected' : ''; ?>>Sortera efter</option>
+                <option value="price_low" <?php echo $sort == 'price_low' ? 'selected' : ''; ?>>Pris: Lågt till högt</option>
+                <option value="price_high" <?php echo $sort == 'price_high' ? 'selected' : ''; ?>>Pris: Högt till lågt</option>
+                <option value="name" <?php echo $sort == 'alphabetical' ? 'selected' : ''; ?>>A - Z</option>
+            </select>
+        </form>
+    </div>
 
     <main class="container">
         <h1>Sortiment</h1>

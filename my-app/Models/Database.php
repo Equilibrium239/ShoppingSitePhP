@@ -70,6 +70,33 @@ class Database {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Hämtar produkter baserat på kategori och sortering
+    function getProductsFilterd($category = null, $sort = 'default') {
+        $sql = "SELECT * FROM Inventory";
+        $params = [];
+
+        if ($category) {
+            $sql .= "WHERE category_name = :category";
+            $params['category'] = $category;
+        }
+
+        switch ($sort) {
+            case 'price_low':
+                $sql .= " ORDER BY price ASC";
+                break;
+            case 'price_high':
+                $sql .= " ORDER BY price DESC";
+                break;
+            case 'name':
+                $sql .= " ORDER BY name ASC";
+                break;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // Hämtar de mest populära produkterna baserat på antal likes
     function getPopularProducts($limit = 4) {
         $query = $this->pdo->prepare("SELECT * FROM Inventory ORDER BY likes DESC LIMIT :limit");
