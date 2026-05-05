@@ -1,5 +1,6 @@
 <?php 
     require_once(__DIR__ . '/../Models/Database.php');
+    
 
     $db = new Database();
 
@@ -178,6 +179,8 @@
         </div>
     <?php endforeach; ?>
  </div>
+
+        <?php require_once(__DIR__ . '/footer.php'); ?>
 
     </main>
 
