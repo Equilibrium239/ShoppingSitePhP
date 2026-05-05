@@ -132,7 +132,11 @@
 <body>
     <?php require_once(__DIR__ . '/header.php'); ?>
 
-    <div class="sorting-container">
+    
+
+    <main class="container">
+        <h1>Sortiment</h1>
+        <div class="sorting-container">
         <form method="GET" action="Cloths.php">
             <?php if ($category): ?>
                 <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
@@ -146,9 +150,6 @@
             </select>
         </form>
     </div>
-
-    <main class="container">
-        <h1>Sortiment</h1>
 
         <div class="product-grid">
     <?php 
@@ -175,6 +176,7 @@
         </div>
     <?php endforeach; ?>
  </div>
+ 
 
         <?php require_once(__DIR__ . '/footer.php'); ?>
 
