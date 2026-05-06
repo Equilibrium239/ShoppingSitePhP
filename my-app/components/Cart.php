@@ -43,10 +43,10 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Kundvagn</title>
+    <title>Shopping Cart</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 40px; }
         .cart-wrapper { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
@@ -62,12 +62,12 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 <body>
 
 <div class="cart-wrapper">
-    <h2>Din varukorg</h2>
+    <h2>Your Shopping Cart</h2>
 
     <?php if (empty($cart_items)): ?>
         <div class="empty-msg">
-            <p>Här var det tomt! 🛒</p>
-            <a href="Cloths.php">Tillbaka till sortimentet</a>
+            <p>It's empty here! 🛒</p>
+            <a href="Cloths.php">Back to Catalog</a>
         </div>
     <?php else: ?>
         <?php 
@@ -79,22 +79,24 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
                 <img src="/my-app/image/<?php echo $item['imageUrl']; ?>" alt="">
                 <div class="cart-item-info">
                     <strong><?php echo $item['name']; ?></strong><br>
-                    <small>Storlek: <?php echo $item['size']; ?></small>
+                    <small>size: <?php echo $item['size']; ?></small>
                 </div>
                 <div style="text-align: right;">
                     <div><?php echo $item['price']; ?> USD</div>
-                    <a href="cart.php?action=remove&key=<?php echo $item['cart_key']; ?>" class="remove-link">Ta bort</a>
+                    <a href="cart.php?action=remove&key=<?php echo $item['cart_key']; ?>" class="remove-link">Remove</a>
                 </div>
             </div>
         <?php endforeach; ?>
 
-        <div class="total">Totalt: <?php echo $totalPrice; ?> USD</div>
+        <div class="total">Total: <?php echo $totalPrice; ?> USD</div>
         
-        <button style="width: 100%; padding: 15px; background: #222; color: white; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer;">
-            Gå till kassan
-        </button>
+        <a href="Checkout.php" style="text-decoration: none;">
+            <button style="width: 100%; padding: 15px; background: #222; color: white; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer; font-weight: 600;">
+            Go to Checkout
+            </button>
+        </a>
         
-        <a href="Cloths.php" class="back-link">Fortsätt handla</a>
+        <a href="Cloths.php" class="back-link">Continue Shopping</a>
     <?php endif; ?>
 </div>
 
