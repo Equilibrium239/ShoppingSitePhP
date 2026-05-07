@@ -159,13 +159,15 @@
                 <img src="/my-app/image/<?php echo $product['imageUrl']; ?>" alt="<?php echo $product['name']; ?>">
             </div>
             <div class="product-info">
-                <span class="category-badge" style="font-size: 0.7rem; text-transform: uppercase; color: #888;">
+              <span class="category-badge" style="font-size: 0.7rem; text-transform: uppercase; color: #888;">
                 <?php echo htmlspecialchars($product['category_name'] ?? 'Ingen kategori'); ?>
+               </span>
 
-
-                <h3><a href="Product.php?id=<?php echo $product['id']; ?>">
-                    <?php echo $product['name']; ?>
-                </h3></a>
+            <h3>
+                <a href="Product.php?id=<?php echo $product['id']; ?>">
+                    <?php echo htmlspecialchars($product['name']); ?>
+                </a>
+            </h3>
                 <p class="description" style="font-size: 0.8rem; color: #666;"><?php echo $product['description']; ?></p>
                 <p class="size">Storlek: <?php echo $product['size']; ?></p>
                 <p class="price"><?php echo $product['price']; ?> USD</p>

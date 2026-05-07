@@ -73,29 +73,31 @@ class Database {
 
     // Hämtar produkter baserat på kategori och sortering
     function getProductsFilterd($category = null, $sort = 'default') {
-        $sql = "SELECT * FROM Inventory";
-        $params = [];
+          $sql = "SELECT Inventory.*, categories.category_name 
+            FROM Inventory 
+            LEFT JOIN categories ON Inventory.category_id = categories.id";
+    $params = [];
 
-        if ($category) {
-            $sql .= "WHERE category_name = :category";
-            $params['category'] = $category;
-        }
+    if ($category) {
+        $sql .= " WHERE categories.category_name = :category";
+        $params['category'] = $category;
+    }
 
-        switch ($sort) {
-            case 'price_low':
-                $sql .= " ORDER BY price ASC";
-                break;
-            case 'price_high':
-                $sql .= " ORDER BY price DESC";
-                break;
-            case 'name':
-                $sql .= " ORDER BY name ASC";
-                break;
-        }
+    switch ($sort) {
+        case 'price_low':
+            $sql .= " ORDER BY price ASC";
+            break;
+        case 'price_high':
+            $sql .= " ORDER BY price DESC";
+            break;
+        case 'name':
+            $sql .= " ORDER BY Inventory.name ASC";
+            break;
+    }
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Hämtar de mest populära produkterna baserat på antal likes
