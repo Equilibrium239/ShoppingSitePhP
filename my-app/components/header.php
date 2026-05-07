@@ -90,7 +90,7 @@ body {
                     </a>
                 </li>
                 <li>
-                    <a href="my-app/components/Medlemskap.php">
+                    <a href="Medlemskap.php">
                         <button class="Btn">Medlem</button>
                     </a>
                 </li>

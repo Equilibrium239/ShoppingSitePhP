@@ -160,7 +160,7 @@
             </div>
             <div class="product-info">
                 <span class="category-badge" style="font-size: 0.7rem; text-transform: uppercase; color: #888;">
-                <?php echo $product['category_name'] ?? 'Okategoriserad'; ?>
+                <?php echo htmlspecialchars($product['category_name'] ?? 'Ingen kategori'); ?>
 
 
                 <h3><a href="Product.php?id=<?php echo $product['id']; ?>">
@@ -170,7 +170,7 @@
                 <p class="size">Storlek: <?php echo $product['size']; ?></p>
                 <p class="price"><?php echo $product['price']; ?> USD</p>
                 <a href="cart.php?action=add&id=<?php echo $product['id']; ?>" class="BtnCloths">
-                    Lägg i varukorg
+                    Add to Cart
                 </a>
             </div>
         </div>

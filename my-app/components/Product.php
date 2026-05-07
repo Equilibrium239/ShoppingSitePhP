@@ -89,6 +89,7 @@ if (!$product) {
 
         <div class="info-section">
             <h1><?php echo $product['name']; ?></h1>
+            
             <p><strong>Storlek:</strong> <?php echo $product['size']; ?></p>
             <p><strong>Beskrivning:</strong> <?php echo $product['description']; ?></p>
             <p class="price"><?php echo $product['price']; ?> USD</p>
