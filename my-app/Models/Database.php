@@ -50,6 +50,7 @@ class Database {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     // specifik produkt baserat på ID
     function getProduct($id){
         $query = $this->pdo->prepare("SELECT * FROM Inventory WHERE id = :id");
