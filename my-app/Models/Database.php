@@ -101,7 +101,7 @@ class Database {
     }
 
     // Hämtar de mest populära produkterna baserat på antal likes
-    function getPopularProducts($limit = 4) {
+    function getPopularProducts($limit = 10) {
         $query = $this->pdo->prepare("SELECT * FROM Inventory ORDER BY likes DESC LIMIT :limit");
         $query->bindValue(':limit',(int)$limit, PDO::PARAM_INT);
         $query->execute();

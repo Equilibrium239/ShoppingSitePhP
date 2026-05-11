@@ -1,15 +1,16 @@
 <?php 
     require_once(__DIR__ . '/../Models/Database.php');
-    
 
     $db = new Database();
 
-    $category = isset($_GET['category']) ? $_GET['category'] : null;
     $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
+    $category = isset($_GET['category']) ? $_GET['category'] : null;
 
-    $my_products = $db->getAllProducts();
-    $my_products = $db->getProductsFilterd($category, $sort);
-    $popular_products = $db->getPopularProducts();
+    if ($sort == 'popular') {
+        $my_products = $db->getPopularProducts(10);
+    } else {
+        $my_products = $db->getProductsFilterd($category, $sort);
+    }
 ?>
 
 
@@ -147,6 +148,7 @@
                 <option value="price_low" <?php echo $sort == 'price_low' ? 'selected' : ''; ?>>Pris: Lågt till högt</option>
                 <option value="price_high" <?php echo $sort == 'price_high' ? 'selected' : ''; ?>>Pris: Högt till lågt</option>
                 <option value="name" <?php echo $sort == 'alphabetical' ? 'selected' : ''; ?>>A - Z</option>
+                <option value="popular" <?php echo $sort == 'popular' ? 'selected' : ''; ?>>Mest populär</option>
             </select>
         </form>
     </div>
