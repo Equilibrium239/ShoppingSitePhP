@@ -1,6 +1,6 @@
  
  <style>
-    /* Grundinställningar för att footern ska stanna i botten */
+
 body {
     margin: 0;
     display: flex;
@@ -9,13 +9,12 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
-/* Footer-specifika stilar */
+
 .site-footer {
     background: black;
     color: white;
     padding: 3rem 5% 1rem;
-    margin-top: auto; /* Trycker ner footern om innehållet är kort */
-}
+    margin-top: auto; 
 
 .footer-container {
     display: grid;
@@ -37,7 +36,7 @@ body {
 }
 
 .footer-bottom {
-    border-top: 1px solid #333; /* Ändrade från black till #333 så den syns mot svart */
+    border-top: 1px solid #333; 
     padding-top: 1rem;
     text-align: center;
     font-size: 0.9rem;
