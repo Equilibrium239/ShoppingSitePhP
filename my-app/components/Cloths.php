@@ -5,8 +5,13 @@
 
     $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
     $category = isset($_GET['category']) ? $_GET['category'] : null;
+    $search = isset($_GET['search']) ? $_GET['search'] : null; 
 
-    if ($sort == 'popular') {
+
+    if ($search) {
+        
+        $my_products = $db->searchProducts($search);
+    } elseif ($sort == 'popular') {
         $my_products = $db->getPopularProducts(10);
     } else {
         $my_products = $db->getProductsFilterd($category, $sort);
@@ -132,6 +137,7 @@
 
 <body>
     <?php require_once(__DIR__ . '/header.php'); ?>
+    <?php require_once(__DIR__ . '/SearchEnging.php'); ?>
    
 
     
