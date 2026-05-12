@@ -108,6 +108,22 @@ class Database {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    function searchProducts($query) {
+
+    $sql = "SELECT i.*, c.category_name 
+            FROM Inventory i 
+            LEFT JOIN categories c ON i.category_id = c.id 
+            WHERE i.name LIKE :query 
+            OR i.description LIKE :query 
+            OR c.category_name LIKE :query";
+
+    $stmt = $this->pdo->prepare($sql);
+    $searchTerm = "%" . $query . "%";
+    $stmt->execute(['query' => $searchTerm]);
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
     //hämtar admin baserat på användarnamn
     public function getAdmin($username) {
         $stmt = $this->pdo->prepare("SELECT * FROM admin WHERE username = :username");
