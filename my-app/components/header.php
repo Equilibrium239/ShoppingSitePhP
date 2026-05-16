@@ -1,99 +1,60 @@
- 
-<style>
-    
-body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    color: #333;
-}
+<header class="main-header">
 
-/
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 5%;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); 
-}
+    <nav class="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
 
+        <div class="logo">
+            <a href="/index.php" style="text-decoration: none; color: inherit; font-weight: bold;">
+                OUR STORE
+            </a>
+        </div>
 
-.nav-link {
-    text-decoration: none;
-    color: #444;
-    font-weight: 500;
-    transition: color 0.3s;
-}
+        <div class="nav-search" style="flex-grow: 0.5; margin: 0 20px;">
 
-.nav-link:hover {
-    color: #007bff;
-}
+            <form action="/my-app/components/Cloths.php" method="GET" style="display: flex; width: 100%;">
 
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Sök produkter..."
+                    style="width: 100%; padding: 8px 12px; border-radius: 20px 0 0 20px; border: 1px solid #ccc; outline: none;"
+                >
 
-.cart-wrapper {
-    text-decoration: none;
-    color: #333;
-    position: relative;
-    font-size: 1.2rem;
-    display: inline-flex;
-    align-items: center;
-}
+                <button
+                    type="submit"
+                    style="padding: 8px 15px; border-radius: 0 20px 20px 0; border: 1px solid #ccc; border-left: none; background: #222; color: white; cursor: pointer;"
+                >
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
 
-.cart-counter {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: #ff4757;
-    color: white;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 50%;
-    font-weight: bold;
-    line-height: 1;
-}
+            </form>
 
+        </div>
 
-.Btn {
-    background-color: #222;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s ease;
-}
+        <ul class="nav-menu" style="display: flex; list-style: none; gap: 20px; align-items: center; margin: 0;">
 
-.Btn:hover {
-    background-color: #007bff;
-    transform: translateY(-2px);
-}
+            <li>
+                <a href="/my-app/components/Cloths.php" class="nav-link">
+                    Cloths
+                </a>
+            </li>
 
+            <li>
+                <a href="/my-app/components/Cart.php" class="cart-wrapper">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart counter">0</span>
+                </a>
+            </li>
 
-.nav-menu {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin: 0;
-    padding: 0;
-}
-</style>
- <header class="main-header">
-        <nav class="navbar">
-            <ul class="nav-menu">
-                <li><a href="/index.php" class="nav-link">Hem</a></li>
-                <li>
-                    <a href="Cart.php" class="cart-wrapper">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span class="cart counter">0</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="Medlemskap.php">
-                        <button class="Btn">Medlem</button>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </header>
+            <li>
+                <a href="/my-app/components/Medlemskap.php">
+                    <button class="Btn" style="margin: 0;">
+                        Medlem
+                    </button>
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+</header>
