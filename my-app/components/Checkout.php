@@ -183,8 +183,7 @@ foreach ($_SESSION['cart'] as $id) {
                     onchange="toggleCardFields()">
 
                 <option value="card">Card (Visa/Mastercard)</option>
-                <option value="klarna">Klarna</option>
-                <option value="swish">Swish</option>
+               
 
             </select>
 
