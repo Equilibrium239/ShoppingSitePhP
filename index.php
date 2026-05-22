@@ -56,11 +56,11 @@ $pageTitle = "Welcome to our store!";
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-info">
-                <h3>Om Oss</h3>
-                <p>Vi är din destination för moderiktiga kläder.</p>
+                <h3>About Us</h3>
+                <p>We are your destination for fashionable clothing.</p>
             </div>
             <div class="footer-contact">
-                <h3>Kontakta Oss</h3>
+                <h3>Contact us</h3>
                 <p>Email: info@ourstore.com</p>
             </div>
         </div>

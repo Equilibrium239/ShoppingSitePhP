@@ -80,7 +80,7 @@ if (!$product) {
     </style>
 <body>
 
-    <a href="../components/Cloths.php" class="back-btn">Tillbaka till kläder</a>
+    <a href="../components/Cloths.php" class="back-btn">Back to Clothing</a>
 
     <div class="product-detail">
         <div class="image-section">
@@ -90,14 +90,18 @@ if (!$product) {
         <div class="info-section">
             <h1><?php echo $product['name']; ?></h1>
             
-            <p><strong>Storlek:</strong> <?php echo $product['size']; ?></p>
-            <p><strong>Beskrivning:</strong> <?php echo $product['description']; ?></p>
+            <p><strong>Size:</strong> <?php echo $product['size']; ?></p>
+            <p><strong>Description:</strong> <?php echo $product['description']; ?></p>
             <p class="price"><?php echo $product['price']; ?> USD</p>
-            <a href="../components/Cart.php" class="cart-btn">Lägg i varukorg</a>
-
+            <a href="../components/Cart.php?action=add&id=<?php echo $product['id']; ?>" class="cart-btn">
+                Add to cart
+            </a>
         </div>
 
+
     </div>
+
+    <?php require_once(__DIR__ . '/../components/footer.php') ?>
     
 </body>
 </html>
