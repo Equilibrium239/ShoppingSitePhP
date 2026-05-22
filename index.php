@@ -20,7 +20,7 @@ $pageTitle = "Welcome to our store!";
             </div>
 
             <div class="nav-search" style="flex-grow: 0.5; margin: 0 20px;">
-                <form action="my-app/components/Cloths.php" method="GET" style="display: flex; width: 100%;">
+                <form action="my-app/page/Cloths.php" method="GET" style="display: flex; width: 100%;">
                     <input type="text" name="search" placeholder="Sök produkter..." 
                            style="width: 100%; padding: 8px 12px; border-radius: 20px 0 0 20px; border: 1px solid #ccc; outline: none;">
                     <button type="submit" style="padding: 8px 15px; border-radius: 0 20px 20px 0; border: 1px solid #ccc; border-left: none; background: #222; color: white; cursor: pointer;">
@@ -29,15 +29,15 @@ $pageTitle = "Welcome to our store!";
                 </form>
             </div>
             <ul class="nav-menu" style="display: flex; list-style: none; gap: 20px; align-items: center; margin: 0;">
-                <li><a href="my-app/components/Cloths.php" class="nav-link">Cloths</a></li>
+                <li><a href="my-app/page/Cloths.php" class="nav-link">Cloths</a></li>
                 <li>
-                    <a href="my-app/components/Cart.php" class="cart-wrapper">
+                    <a href="my-app/page/Cart.php" class="cart-wrapper">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="cart counter">0</span>
                     </a>
                 </li>
                 <li>
-                    <a href="my-app/components/Medlemskap.php">
+                    <a href="my-app/page/Medlemskap.php">
                         <button class="Btn" style="margin: 0;">Medlem</button>
                     </a>
                 </li>

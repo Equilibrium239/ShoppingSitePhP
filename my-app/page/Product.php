@@ -80,7 +80,7 @@ if (!$product) {
     </style>
 <body>
 
-    <a href="../components/Cloths.php" class="back-btn">Back to Clothing</a>
+    <a href="../page/Cloths.php" class="back-btn">Back to Clothing</a>
 
     <div class="product-detail">
         <div class="image-section">
