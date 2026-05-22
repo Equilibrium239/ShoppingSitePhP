@@ -136,7 +136,7 @@
 </style>
 
 <body>
-    <?php require_once(__DIR__ . '/header.php'); ?>
+    <?php require_once(__DIR__ . '/../components/header.php'); ?>
     
    
 
@@ -145,7 +145,7 @@
     <main class="container">
         <h1>Sortiment</h1>
         <div class="sorting-container">
-        <form method="GET" action="Cloths.php">
+        <form method="GET" action="/my-app/page/Cloths.php">
             <?php if ($category): ?>
                 <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
             <?php endif; ?>
@@ -189,7 +189,7 @@
  </div>
  
 
-        <?php require_once(__DIR__ . '/footer.php'); ?>
+        <?php require_once(__DIR__ . '/../components/footer.php'); ?>
 
     </main>
 

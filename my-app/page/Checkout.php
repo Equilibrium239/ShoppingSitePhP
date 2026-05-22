@@ -135,7 +135,7 @@ foreach ($_SESSION['cart'] as $id) {
 
 </head>
 <body>
-    <?php require_once(__DIR__ . '/Header.php'); ?>
+    <?php require_once(__DIR__ . '/../components/Header.php'); ?>
 
     <div class="checkout-layout">
 
@@ -279,7 +279,7 @@ foreach ($_SESSION['cart'] as $id) {
 
 </form>
 
-    <?php require_once(__DIR__ . '/footer.php'); ?>
+    <?php require_once(__DIR__ . '/../components/footer.php'); ?>
 
 
 

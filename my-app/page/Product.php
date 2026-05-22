@@ -93,7 +93,7 @@ if (!$product) {
             <p><strong>Size:</strong> <?php echo $product['size']; ?></p>
             <p><strong>Description:</strong> <?php echo $product['description']; ?></p>
             <p class="price"><?php echo $product['price']; ?> USD</p>
-            <a href="../components/Cart.php?action=add&id=<?php echo $product['id']; ?>" class="cart-btn">
+            <a href="../page/Cart.php?action=add&id=<?php echo $product['id']; ?>" class="cart-btn">
                 Add to cart
             </a>
         </div>
