@@ -140,7 +140,7 @@ foreach ($_SESSION['cart'] as $id) {
     <div class="checkout-layout">
 
     
-    <form action="process_checkout.php" method="POST">
+    <form action="../page/process_checkout.php" method="POST">
 
 <div class="checkout-layout">
 

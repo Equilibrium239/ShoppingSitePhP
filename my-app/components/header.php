@@ -4,7 +4,7 @@
 
         <div class="logo">
             <a href="/index.php" style="text-decoration: none; color: inherit; font-weight: bold;">
-                OUR STORE
+                Sneak Store
             </a>
         </div>
 
