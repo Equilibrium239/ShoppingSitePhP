@@ -1,38 +1,59 @@
 <?php
+require_once '../../vendor/autoload.php';
 
 class UserDatabase {
     private $pdo;
+    private $auth;
 
     function __construct($pdo) {
         $this->pdo = $pdo;
+        $this->auth = new \Delight\Auth\Auth($pdo);
+    }
+
+    function getAuth() {
+        return $this->auth;
     }
 
     // Registrera ny användare
     function registerUser($username, $email, $password) {
-        // Kolla om email redan finns
-        $check = $this->pdo->prepare("SELECT id FROM Users WHERE email = ?");
-        $check->execute([$email]);
-        if ($check->fetch()) {
+        try {
+            $this->auth->register($email, $password, $username);
+            return ["success" => true, "message" => "Användare registrerad!"];
+        } catch (\Delight\Auth\InvalidEmailException $e) {
+            return ["success" => false, "message" => "Ogiltig e-postadress."];
+        } catch (\Delight\Auth\InvalidPasswordException $e) {
+            return ["success" => false, "message" => "Ogiltigt lösenord."];
+        } catch (\Delight\Auth\UserAlreadyExistsException $e) {
             return ["success" => false, "message" => "Email redan registrerad."];
         }
-
-        $sql = "INSERT INTO Users (username, email, password) VALUES (?, ?, ?)";
-        $query = $this->pdo->prepare($sql);
-        $query->execute([$username, $email, $password]);
-
-        return ["success" => true, "message" => "Användare registrerad!"];
     }
 
     // Logga in användare
     function loginUser($email, $password) {
-        $query = $this->pdo->prepare("SELECT * FROM Users WHERE email = ? AND password = ?");
-        $query->execute([$email, $password]);
-        $user = $query->fetch(PDO::FETCH_ASSOC);
-
-        if ($user) {
-            return ["success" => true, "user" => $user];
-        } else {
+        try {
+            $this->auth->login($email, $password);
+            return ["success" => true, "message" => "Inloggad!"];
+        } catch (\Delight\Auth\InvalidEmailException $e) {
+            return ["success" => false, "message" => "Ogiltig e-postadress."];
+        } catch (\Delight\Auth\InvalidPasswordException $e) {
             return ["success" => false, "message" => "Fel email eller lösenord."];
+        } catch (\Delight\Auth\EmailNotVerifiedException $e) {
+            return ["success" => false, "message" => "E-posten är inte verifierad."];
+        } catch (\Delight\Auth\TooManyRequestsException $e) {
+            return ["success" => false, "message" => "För många försök. Försök igen senare."];
+        }
+    }
+
+    function setupUsers() {
+    }
+
+    function seedUsers() {
+        if ($this->pdo->query("SELECT * FROM users WHERE email='stefan.holmberg@systementor.se'")->rowCount() == 0) {
+            $userId = $this->auth->admin()->createUser(
+                "stefan.holmberg@systementor.se",
+                "Hejsan123#",
+                "stefan.holmberg@systementor.se"
+            );
         }
     }
 }

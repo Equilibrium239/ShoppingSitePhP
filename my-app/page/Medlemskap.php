@@ -1,16 +1,33 @@
+<?php
+ob_start();
+require_once('../Models/Database.php');
 
+$database = new Database();
 
+$message = "";
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    try {
+        $database->getUsersDatabase()->getAuth()->login($email, $password);
+        header("Location: /");
+        exit;
+    } catch (\Delight\Auth\InvalidEmailException $e) {
+        $message = "❌ Fel användarnamn eller lösenord";
+    } catch (\Delight\Auth\InvalidPasswordException $e) {
+        $message = "❌ Fel användarnamn eller lösenord";
+    }
+}
+?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bli Medlem</title>
-    <link rel="stylesheet" href="my-app/src/style.css">
- <style>
-      
+    <title>Logga in</title>
+    <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7f6;
@@ -38,7 +55,6 @@
             font-weight: 600;
         }
 
-        
         .form-label {
             display: block;
             text-align: left;
@@ -47,11 +63,10 @@
             font-size: 0.9rem;
         }
 
-       
         .form-input {
             width: 100%;
             padding: 12px 15px;
-            margin-bottom: 5px; 
+            margin-bottom: 5px;
             border: 1px solid #ddd;
             border-radius: 6px;
             box-sizing: border-box;
@@ -65,7 +80,6 @@
             box-shadow: 0 0 5px rgba(0,0,0,0.1);
         }
 
-        
         .btn-primary {
             width: 100%;
             padding: 14px;
@@ -85,12 +99,6 @@
             background-color: #555;
         }
 
-        p {
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-            color: #777;
-        }
-
         .btn-link {
             color: #333;
             text-decoration: none;
@@ -102,80 +110,45 @@
             text-decoration: underline;
         }
 
-      
-        br {
-            display: none;
+        p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .msg-error {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
     <div class="form-wrapper">
-     <h2 class="form-title">Logga in om du är medlem</h2>
+        <h2 class="form-title">Logga in</h2>
 
-      <form action="Register.php" method="POST" class="auth-form">
-        <label for="name" class="form-label">Namn:</label><br>
-        <input type="text" id="name" name="name" class="form-input" required><br><br>
+        <form method="POST">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email" id="email" name="email" class="form-input" placeholder="Din email" required>
 
-        <label for="email" class="form-label">Email:</label><br>
-        <input type="email" id="email" name="email" class="form-input" required><br><br>
+            <label for="password" class="form-label">Lösenord:</label>
+            <input type="password" id="password" name="password" class="form-input" placeholder="Ditt lösenord" required>
 
-        <label for="password" class="form-label">Lösenord:</label><br>
-        <input type="password" id="password" name="password" class="form-input" required><br><br>
+            <button type="submit" class="btn-primary">Logga in</button>
 
-        <button type="submit" class="btn-primary">Logga in</button>
+            <?php if ($message): ?>
+                <div class="msg-error"><?php echo $message; ?></div>
+            <?php endif; ?>
 
-        <div>
-            <p>Inte medlem än?</p>
-            <a href="Register.php" class="btn-link">Registrera dig här</a>
-        </div>
-
-      </form>
+            <div>
+                <p>Inte medlem än?</p>
+                <a href="Register.php" class="btn-link">Registrera dig här</a>
+            </div>
+        </form>
     </div>
-
-
-    <?php 
-
-$host = 'localhost';
-$dbname = 'Shopping';
-$user = 'root';
-$password = 'root'; 
-
-$conn = new mysqli($host, $user, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-    $username = $_POST['username'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    if (!$username || !$email || !$password) {
-        die("❌ Fyll i alla fält");
-    }
-
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-    $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?,?,?)");
-    $stmt->bind_param("sss", $username, $email, $hashedPassword);
-
-    if ($stmt->execute()) {
-        echo "✅ Välkommen, $username! Du är nu medlem!";
-    } else {
-        echo "❌ Fel: " . $stmt->error;
-    }
-
-    $stmt->close();
-}
-
-$conn->close();
-
-?>
-
-
-    
 </body>
 </html>
-

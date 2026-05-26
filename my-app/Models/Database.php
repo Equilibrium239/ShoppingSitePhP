@@ -37,6 +37,18 @@ class Database {
         }
     }
 
+
+    function addUserDetails($id, $streetaddress, $name, $postalCode, $city){
+        $query = $this->pdo->prepare("INSERT INTO UserDetails (id, streetaddress, name, postalCode, city) VALUES (:id, :streetaddress, :name, :postalCode, :city)");
+        $query->execute([
+            "id" => $id,
+            "streetaddress" => $streetaddress, 
+            "name" => $name,
+            "postalCode" => $postalCode,
+            "city" => $city
+        ]);
+    }
+
     // Hämtar alla produkter 
     function getAllProducts($sortCol = "id", $sortOrder = "asc"){
         $validCols = ["id", "name", "size", "price"];
