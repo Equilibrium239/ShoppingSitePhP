@@ -1,8 +1,8 @@
 <?php 
-require_once(__DIR__ . '/../my-app/Models/Database.php');
+require_once(__DIR__ . '/../Models/Database.php');
 require_once __DIR__ . '/../../vendor/autoload.php';
-require_once(__DIR__ . '/../my-app/Models/userDatabase.php');
-
+require_once(__DIR__ . '/../Models/userDatabase.php');
+require_once(__DIR__ . '/../Models/Product.php');
 
 
 $db = new Database();
@@ -11,9 +11,9 @@ $allProducts = $db->getAllProducts();
 
 foreach ($allProducts as $product) {
     ?>
-    <h1><?php echo $product->name; ?></h1>
-    <p><?php echo $product->description; ?></p>
-    <p>Pris: <?php echo $product->price; ?> kr</p>
+    <h1><?php echo $product['name']; ?></h1>
+    <p><?php echo $product['description']; ?></p>
+    <p>Pris: <?php echo $product['price']; ?> kr</p>
     <?php
 }
 ?>
@@ -29,10 +29,10 @@ foreach ($allProducts as $product) {
 foreach ($allProducts as $product) {
 ?>
     <item>
-      <g:id><?php echo $product->id; ?></g:id>
-      <g:title><?php echo $product->name; ?></g:title>
-      <g:price><?php echo $product->price; ?> USD</g:price>
-      <g:link>http://localhost:8080/product?pid=<?php echo $product->id; ?></g:link>
+      <g:id><?php echo $product['id']; ?></g:id>
+      <g:title><?php echo $product['name']; ?></g:title>
+      <g:price><?php echo $product['price']; ?> USD</g:price>
+      <g:link>http://localhost:8080/product?pid=<?php echo $product['id']; ?></g:link>
     </item>
 <?php } ?>
 
