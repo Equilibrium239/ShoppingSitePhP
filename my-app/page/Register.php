@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $userid = $database->getUsersDatabase()->getAuth()->register($email, $password, $email);
             $database->addUserDetails($userid, $name, $streetaddress, $postalCode, $city);
-            header("Location: /AccountLogin.php");
+            header("Location: Medlemskap.php");
             exit;
         } catch (\Delight\Auth\UserAlreadyExistsException $e) {
             $message = "❌ Användaren finns redan.";
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
 
-        <a class="login-link" href="/AccountLogin.php">Har du redan ett konto? Logga in här</a>
+        <a class="login-link" href="/Medlemskap.php">Har du redan ett konto? Logga in här</a>
     </div>
 </body>
 </html>

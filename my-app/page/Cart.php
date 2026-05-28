@@ -54,7 +54,6 @@ $itemsCount = $cart->getItemsCount();
     <?php if (empty($cartItems)): ?>
         <div class="empty-msg">
             <p>It's empty here! 🛒</p>
-            <a href="Cloths.php">Back to Catalog</a>
         </div>
     <?php else: ?>
         <?php foreach ($cartItems as $item): ?>
@@ -75,10 +74,8 @@ $itemsCount = $cart->getItemsCount();
 
         <div class="total">Total: <?php echo $totalPrice; ?> USD</div>
 
-        <a href="Checkout.php" style="text-decoration: none;">
-            <button style="width: 100%; padding: 15px; background: #222; color: white; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer; font-weight: 600;">
-                Go to Checkout
-            </button>
+       <a href="Checkout.php" style="display: block; text-align: center; padding: 15px; background: #222; color: white; border-radius: 8px; margin-top: 20px; font-weight: 600; text-decoration: none;">
+            Go to Checkout
         </a>
 
         <a href="Cloths.php" class="back-link">Continue Shopping</a>

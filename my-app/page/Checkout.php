@@ -1,10 +1,14 @@
 <?php 
 session_start();
 require_once(__DIR__ . '/../Models/Database.php');
+require_once(__DIR__ . '/../Models/CartLogic.php');
+require_once(__DIR__ . '/../Models/CartItem.php');
 
 $db = new Database();
+$cart = new Cart($db, session_id());
+$cartItems = $cart->getItems();
 
-if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
+if (empty($cartItems)) {
     header('Location: Cloths.php');
     exit();
 }
@@ -12,12 +16,9 @@ if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
 $checkout_items = [];
 $totalPrice = 0;
 
-foreach ($_SESSION['cart'] as $id) {
-    $product = $db->getProduct($id);
-    if ($product) {
-        $checkout_items[] = $product;
-        $totalPrice += $product['price'];
-    }
+foreach ($cartItems as $item) {
+    $checkout_items[] = $item;
+    $totalPrice += $item->rowPrice;
 }
 ?>
 
@@ -125,11 +126,9 @@ foreach ($_SESSION['cart'] as $id) {
 }
 
 @media (max-width: 800px) {
-
     .checkout-layout {
         grid-template-columns: 1fr;
     }
-
 }
 </style>
 
@@ -137,152 +136,118 @@ foreach ($_SESSION['cart'] as $id) {
 <body>
     <?php require_once(__DIR__ . '/../components/Header.php'); ?>
 
-    <div class="checkout-layout">
-
-    
     <form action="../page/process_checkout.php" method="POST">
 
-<div class="checkout-layout">
+        <div class="checkout-layout">
 
-    
-    <div class="checkout-box">
+            <!-- Vänster: Leveransinformation & betalning -->
+            <div class="checkout-box">
 
-        <h2>Delivery Information</h2>
+                <h2>Delivery Information</h2>
 
-        <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" name="fullName" placeholder="John Doe" required>
-        </div>
-
-        <div class="form-group">
-            <label>Address</label>
-            <input type="text" name="address" placeholder="123 Main Street" required>
-        </div>
-
-        <div style="display:flex; gap:10px;">
-
-            <div class="form-group" style="flex:1;">
-                <label>Postnumber</label>
-                <input type="text" name="zip" placeholder="123 45" required>
-            </div>
-
-            <div class="form-group" style="flex:2;">
-                <label>City</label>
-                <input type="text" name="city" placeholder="Stockholm" required>
-            </div>
-
-        </div>
-
-      
-        <div class="form-group">
-
-            <label>Payment Method</label>
-
-            <select name="paymentMethod"
-                    id="paymentMethod"
-                    onchange="toggleCardFields()">
-
-                <option value="card">Card (Visa/Mastercard)</option>
-                <option value="paypal">PayPal</option>
-            </select>
-
-        </div>
-
-       
-        <div id="cardFields">
-
-            <div class="form-group">
-                <label>Card Number</label>
-                <input type="text"
-                       name="cardNumber"
-                       placeholder="1234 5678 9012 3456">
-            </div>
-
-            <div style="display:flex; gap:10px;">
-
-                <div class="form-group" style="flex:1;">
-                    <label>Expiry Date</label>
-                    <input type="text"
-                           name="expiry"
-                           placeholder="MM/YY">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="fullName" placeholder="John Doe" required>
                 </div>
 
-                <div class="form-group" style="flex:1;">
-                    <label>CVV</label>
-                    <input type="text"
-                           name="cvv"
-                           placeholder="123">
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" name="address" placeholder="123 Main Street" required>
                 </div>
 
-            </div>
-
-            <div class="form-group">
-                <label>Name on Card</label>
-                <input type="text"
-                       name="cardName"
-                       placeholder="John Doe">
-            </div>
-
-        </div>
-
-    </div>
-
-   
-    <div class="checkout-box">
-
-        <h2>Your order</h2>
-
-        <?php foreach ($checkout_items as $item): ?>
-
-        <div class="summary-item">
-
-            <div style="display:flex; gap:15px;">
-
-                <img src="/my-app/image/<?php echo $item['imageUrl']; ?>" alt="">
-
-                <div>
-                    <div style="font-weight:600;">
-                        <?php echo $item['name']; ?>
+                <div style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>Postnumber</label>
+                        <input type="text" name="zip" placeholder="123 45" required>
                     </div>
+                    <div class="form-group" style="flex:2;">
+                        <label>City</label>
+                        <input type="text" name="city" placeholder="Stockholm" required>
+                    </div>
+                </div>
 
-                    <div style="font-size:0.8rem; color:#777;">
-                        Size: <?php echo $item['size']; ?>
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select name="paymentMethod" id="paymentMethod" onchange="toggleCardFields()">
+                        <option value="card">Card (Visa/Mastercard)</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                </div>
+
+                <div id="cardFields">
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456">
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Expiry Date</label>
+                            <input type="text" name="expiry" placeholder="MM/YY">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>CVV</label>
+                            <input type="text" name="cvv" placeholder="123">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Name on Card</label>
+                        <input type="text" name="cardName" placeholder="John Doe">
                     </div>
                 </div>
 
             </div>
 
-            <div style="font-weight:600;">
-                <?php echo $item['price']; ?> USD
+            <!-- Höger: Ordersammanfattning -->
+            <div class="checkout-box">
+
+                <h2>Your order</h2>
+
+                <?php foreach ($checkout_items as $item): ?>
+                    <div class="summary-item">
+                        <div style="display:flex; gap:15px;">
+                            <img src="/my-app/image/<?php echo htmlspecialchars($item->imageUrl ?? ''); ?>" alt="">
+                            <div>
+                                <div style="font-weight:600;">
+                                    <?php echo htmlspecialchars($item->productName); ?>
+                                </div>
+                                <div style="font-size:0.8rem; color:#777;">
+                                    Antal: <?php echo $item->quantity; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="font-weight:600;">
+                            <?php echo $item->rowPrice; ?> USD
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+
+                <div class="total-row">
+                    <span>Total</span>
+                    <span><?php echo $totalPrice; ?> USD</span>
+                </div>
+
+                <p style="font-size:0.8rem; color:#999; margin-top:20px; text-align:center;">
+                    Free shipping & 30-day money back guarantee.
+                </p>
+
+                <button type="submit" class="btn-pay">
+                    Confirm Purchase
+                </button>
+
             </div>
 
         </div>
 
-        <?php endforeach; ?>
-
-        <div class="total-row">
-            <span>Total</span>
-            <span><?php echo $totalPrice; ?> USD</span>
-        </div>
-
-        <p style="font-size:0.8rem; color:#999; margin-top:20px; text-align:center;">
-            Free shipping & 30-day money back guarantee.
-        </p>
-
-        <button type="submit" class="btn-pay">
-            Confirm Purchase
-        </button>
-
-    </div>
-
-</div>
-
-</form>
+    </form>
 
     <?php require_once(__DIR__ . '/../components/footer.php'); ?>
 
+<script>
+function toggleCardFields() {
+    const method = document.getElementById('paymentMethod').value;
+    document.getElementById('cardFields').style.display = method === 'card' ? 'block' : 'none';
+}
+</script>
 
-
-    </div>
 </body>
 </html>

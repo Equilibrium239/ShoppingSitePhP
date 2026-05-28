@@ -1,8 +1,10 @@
 <?php
 ob_start();
 require_once('../Models/Database.php');
+require_once('../Models/UserDatabase.php');
 
 $database = new Database();
+
 
 $message = "";
 

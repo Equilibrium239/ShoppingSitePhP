@@ -48,7 +48,12 @@ class Cart {
         }
     }
 
-    public function getCartItem($productId) {
+    /**
+     * Get a cart item by product ID.
+     * @param mixed $productId
+     * @return object|null
+     */
+    public function getCartItem($productId): ?object {
         foreach ($this->cartItems as $item) {
             if ($item->productId == $productId) {
                 return $item;

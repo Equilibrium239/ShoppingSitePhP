@@ -31,7 +31,7 @@ class Database {
             $this->pdo = new PDO($dsn, $user, $pass);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            //$this->usersDatabase = new UserDatabase($this->pdo);
+            $this->usersDatabase = new UserDatabase($this->pdo);
         } catch (PDOException $e) {
             die("Anslutning misslyckades: " . $e->getMessage());
         }
