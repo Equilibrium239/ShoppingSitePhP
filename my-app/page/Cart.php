@@ -54,6 +54,7 @@ $itemsCount = $cart->getItemsCount();
     <?php if (empty($cartItems)): ?>
         <div class="empty-msg">
             <p>It's empty here! 🛒</p>
+            <a href="Cloths.php" class="back-link">Back to Catalog</a>
         </div>
     <?php else: ?>
         <?php foreach ($cartItems as $item): ?>
