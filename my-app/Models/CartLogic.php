@@ -10,15 +10,11 @@ class Cart {
         $this->dbContext = $dbContext;
         $this->session_id = $session_id;
         $this->userId = $userId;
-        // i princip = select * from cartitem where sessionId = $session_id 
-        // 
-        $this->cartItems = $this->dbContext->getCartItems($userId,$session_id);
-
+        $this->cartItems = $this->dbContext->getCartItems($userId, $session_id);
     }
 
     public function convertSessionToUser($userId, $newSessionId) {
         $this->dbContext->convertSessionToUser($this->session_id, $userId, $newSessionId);
-      
         $this->userId = $userId;
         $this->session_id = $newSessionId;
     }
@@ -29,30 +25,29 @@ class Cart {
             $item = new CartItem();
             $item->productId = $productId;
             $item->quantity = $quantity;
+            $item->productPrice = $this->dbContext->getProduct($productId)['price'];
+            $item->rowPrice = $item->productPrice * $item->quantity;
             array_push($this->cartItems, $item);
-        }else{
+        } else {
             $item->quantity += $quantity;
+            $item->rowPrice = $item->productPrice * $item->quantity;
         }
-        $this->dbContext->updateCartItem($this->userId,$this->session_id, $productId, $item->quantity);
+        $this->dbContext->updateCartItem($this->userId, $this->session_id, $productId, $item->quantity);
     }
 
     public function removeItem($productId, $quantity) {
         $item = $this->getCartItem($productId);
-        if( !$item) {
+        if (!$item) {
             return;
         }
         $item->quantity -= $quantity;
-        $this->dbContext->updateCartItem($this->userId,$this->session_id, $productId, $item->quantity);
+        $item->rowPrice = $item->productPrice * $item->quantity;
+        $this->dbContext->updateCartItem($this->userId, $this->session_id, $productId, $item->quantity);
         if ($item->quantity <= 0) {
             array_splice($this->cartItems, array_search($item, $this->cartItems), 1);
         }
     }
 
-    /**
-     * Get a cart item by product ID.
-     * @param mixed $productId
-     * @return object|null
-     */
     public function getCartItem($productId): ?object {
         foreach ($this->cartItems as $item) {
             if ($item->productId == $productId) {
@@ -62,14 +57,12 @@ class Cart {
         return null;
     }
 
-
     public function getItemsCount() {
         $count = 0;
         foreach ($this->cartItems as $item) {
             $count += $item->quantity;
         }
         return $count;
-        //return count($this->cartItems);
     }
 
     public function getTotalPrice() {
@@ -80,7 +73,6 @@ class Cart {
         return $total;
     }
 
-
     public function getItems() {
         return $this->cartItems;
     }
@@ -89,6 +81,5 @@ class Cart {
         $this->cartItems = [];
     }
 }
-
 
 ?>
