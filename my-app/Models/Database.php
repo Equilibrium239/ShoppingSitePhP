@@ -161,5 +161,60 @@ class Database {
         $query = $this->pdo->prepare("DELETE FROM Inventory WHERE id = ?");
         $query->execute([$id]);
     }
+
+     public function getCartItems($userId, $session_id) {
+    $cartItems = [];
+
+    if ($userId) {
+        $stmt = $this->pdo->prepare("
+            SELECT ci.*, i.name AS productName, i.price AS productPrice, (i.price * ci.quantity) AS rowPrice
+            FROM CartItem ci
+            JOIN Inventory i ON ci.productId = i.id
+            WHERE ci.userId = ?
+        ");
+        $stmt->execute([$userId]);
+    } else {
+        $stmt = $this->pdo->prepare("
+            SELECT ci.*, i.name AS productName, i.price AS productPrice, (i.price * ci.quantity) AS rowPrice
+            FROM CartItem ci
+            JOIN Inventory i ON ci.productId = i.id
+            WHERE ci.sessionId = ?
+        ");
+        $stmt->execute([$session_id]);
+    }
+
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $item = new CartItem();
+        $item->id = $row['id'];
+        $item->productId = $row['productId'];
+        $item->quantity = $row['quantity'];
+        $item->productName = $row['productName'];
+        $item->productPrice = $row['productPrice'];
+        $item->rowPrice = $row['rowPrice'];
+        $cartItems[] = $item;
+    }
+
+    return $cartItems;
+}
+
+public function updateCartItem($userId, $session_id, $productId, $quantity) {
+    if ($quantity <= 0) {
+        $stmt = $this->pdo->prepare("DELETE FROM CartItem WHERE productId = ? AND (userId = ? OR sessionId = ?)");
+        $stmt->execute([$productId, $userId, $session_id]);
+    } else {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO CartItem (productId, userId, sessionId, quantity)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE quantity = ?
+        ");
+        $stmt->execute([$productId, $userId, $session_id, $quantity, $quantity]);
+    }
+}
+
+public function convertSessionToUser($session_id, $userId, $newSessionId) {
+    $stmt = $this->pdo->prepare("UPDATE CartItem SET userId = ?, sessionId = ? WHERE sessionId = ?");
+    $stmt->execute([$userId, $newSessionId, $session_id]);
+}
+
 }
 ?>

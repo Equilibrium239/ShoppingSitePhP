@@ -1,45 +1,32 @@
 <?php
-session_start(); 
+session_start();
 require_once(__DIR__ . '/../Models/Database.php');
-$db = new Database();
+require_once(__DIR__ . '/../Models/CartLogic.php');
+require_once(__DIR__ . '/../Models/CartItem.php');
 
+$database = new Database();
+$cart = new Cart($database, session_id());
 
-if (isset($_GET['action']) && $_GET['action'] == "add") {
-    $id = intval($_GET['id']); 
-    
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
+if (isset($_GET['action'])) {
+    $id = intval($_GET['id']);
+    $fromPage = urlencode($_SERVER['PHP_SELF']);
+
+    if ($_GET['action'] === 'add') {
+        $cart->addItem($id, 1);
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     }
 
-
-    $_SESSION['cart'][] = $id;
-    
- 
-    header("Location: cart.php");
-    exit();
-}
-
-if (isset($_GET['action']) && $_GET['action'] == "remove") {
-    $key = $_GET['key'];
-    if (isset($_SESSION['cart'][$key])) {
-        unset($_SESSION['cart'][$key]);
-    }
-    header("Location: cart.php");
-    exit();
-}
-
-
-$cart_items = [];
-if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
-    foreach ($_SESSION['cart'] as $key => $id) {
-        $product = $db->getProduct($id); 
-        if ($product) {
-            
-            $product['cart_key'] = $key;
-            $cart_items[] = $product;
-        }
+    if ($_GET['action'] === 'remove') {
+        $cart->removeItem($id, 1);
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     }
 }
+
+$cartItems = $cart->getItems();
+$totalPrice = $cart->getTotalPrice();
+$itemsCount = $cart->getItemsCount();
 ?>
 
 <!DOCTYPE html>
@@ -62,40 +49,38 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 <body>
 
 <div class="cart-wrapper">
-    <h2>Your Shopping Cart</h2>
+    <h2>Your Shopping Cart (<?php echo $itemsCount; ?> items)</h2>
 
-    <?php if (empty($cart_items)): ?>
+    <?php if (empty($cartItems)): ?>
         <div class="empty-msg">
             <p>It's empty here! 🛒</p>
             <a href="Cloths.php">Back to Catalog</a>
         </div>
     <?php else: ?>
-        <?php 
-        $totalPrice = 0;
-        foreach ($cart_items as $item): 
-            $totalPrice += $item['price'];
-        ?>
+        <?php foreach ($cartItems as $item): ?>
             <div class="cart-item">
-                <img src="/my-app/image/<?php echo $item['imageUrl']; ?>" alt="">
+                <img src="/my-app/image/<?php echo htmlspecialchars($item->imageUrl ?? ''); ?>" alt="">
                 <div class="cart-item-info">
-                    <strong><?php echo $item['name']; ?></strong><br>
-                    <small>size: <?php echo $item['size']; ?></small>
+                    <strong><?php echo htmlspecialchars($item->productName); ?></strong><br>
+                    <small>Antal: <?php echo $item->quantity; ?></small>
                 </div>
                 <div style="text-align: right;">
-                    <div><?php echo $item['price']; ?> USD</div>
-                    <a href="cart.php?action=remove&key=<?php echo $item['cart_key']; ?>" class="remove-link">Remove</a>
+                    <div><?php echo $item->rowPrice; ?> USD</div>
+                    <a href="?action=add&id=<?php echo $item->productId; ?>" style="color: #4CAF50; text-decoration: none; font-size: 0.8rem;">+</a>
+                    &nbsp;
+                    <a href="?action=remove&id=<?php echo $item->productId; ?>" class="remove-link">−</a>
                 </div>
             </div>
         <?php endforeach; ?>
 
         <div class="total">Total: <?php echo $totalPrice; ?> USD</div>
-        
+
         <a href="Checkout.php" style="text-decoration: none;">
             <button style="width: 100%; padding: 15px; background: #222; color: white; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer; font-weight: 600;">
-            Go to Checkout
+                Go to Checkout
             </button>
         </a>
-        
+
         <a href="Cloths.php" class="back-link">Continue Shopping</a>
     <?php endif; ?>
 </div>
