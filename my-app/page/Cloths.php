@@ -134,6 +134,23 @@
 
 
 </style>
+<script>
+function addToCart(productId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Lägger till...';
+
+    fetch(`/my-app/page/Cart.php?action=add&id=${productId}&ajax=1`)
+        .then(res => res.json())
+        .then(data => {
+            document.querySelector('.cart.counter').textContent = data.count;
+            btn.textContent = 'Tillagd ✓';
+            setTimeout(() => {
+                btn.textContent = 'Add to Cart';
+                btn.disabled = false;
+            }, 1500);
+        });
+}
+</script>
 
 <body>
     <?php require_once(__DIR__ . '/../components/header.php'); ?>
@@ -180,9 +197,9 @@
                 <p class="description" style="font-size: 0.8rem; color: #666;"><?php echo $product['description']; ?></p>
                 <p class="size">Storlek: <?php echo $product['size']; ?></p>
                 <p class="price"><?php echo $product['price']; ?> USD</p>
-                <a href="cart.php?action=add&id=<?php echo $product['id']; ?>" class="BtnCloths">
+               <button class="BtnCloths" onclick="addToCart(<?php echo $product['id']; ?>, this)">
                     Add to Cart
-                </a>
+                </button>
             </div>
         </div>
     <?php endforeach; ?>

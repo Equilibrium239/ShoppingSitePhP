@@ -9,11 +9,18 @@ $cart = new Cart($database, session_id());
 
 if (isset($_GET['action'])) {
     $id = intval($_GET['id']);
-    $fromPage = urlencode($_SERVER['PHP_SELF']);
 
     if ($_GET['action'] === 'add') {
         $cart->addItem($id, 1);
-        header("Location: " . $_SERVER['PHP_SELF']);
+
+        if (isset($_GET['ajax'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['count' => $cart->getItemsCount()]);
+            exit();
+        }
+
+        $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : $_SERVER['PHP_SELF'];
+        header("Location: " . $redirect);
         exit();
     }
 

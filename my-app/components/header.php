@@ -1,3 +1,13 @@
+<?php
+require_once(__DIR__ . '/../Models/Database.php');
+require_once(__DIR__ . '/../Models/CartLogic.php');
+require_once(__DIR__ . '/../Models/CartItem.php');
+
+$database = new Database();
+$cart = new Cart($database, session_id());
+$cartCount = $cart->getItemsCount();
+?>
+
 <header class="main-header">
 
     <nav class="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
@@ -41,7 +51,7 @@
             <li>
                 <a href="/my-app/page/Cart.php" class="cart-wrapper">
                     <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="cart counter">0</span>
+                    <span class="cart counter"><?php echo $cartCount; ?></span>
                 </a>
             </li>
 
