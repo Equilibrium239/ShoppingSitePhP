@@ -143,6 +143,27 @@ class Database {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+
+    function getAllFreightRules(){
+        $query = $this->pdo->query("SELECT id, zone_code as zoneCode, zone_name as zoneName, base_fee as baseFee, weight_modifier as weightMultiplier, free_shipping_threshold as freeShippingThreshold FROM freight_rules");
+        $freightRules = $query->fetchAll(PDO::FETCH_CLASS, "FreightRule"); // KLASSNAMNET!!!
+        return $freightRules;
+    }
+
+    function updateFreightRule($zoneCode, $zoneName, $baseFee, $weightMultiplier, $freeShippingLimit){
+        //    
+        $query = $this->pdo->prepare("INSERT INTO freight_rules (zone_code, zone_name, base_fee, weight_modifier," .
+            " free_shipping_threshold) VALUES (:zoneCode, :zoneName, :baseFee, :weight_modifier, :free_shipping_threshold)" . 
+            " ON DUPLICATE KEY UPDATE zone_name=:zoneName, base_fee=:baseFee, weight_modifier=:weight_modifier, free_shipping_threshold=:free_shipping_threshold");
+        $query->execute([
+            'zoneCode' => $zoneCode,
+            'zoneName' => $zoneName,
+            'baseFee' => $baseFee,
+            'weight_modifier' => $weightMultiplier,
+            'free_shipping_threshold' => $freeShippingLimit
+        ]);
+    }
+
     // Uppdaterar en produkt
     function updateProduct($id, $name, $size, $description, $imageUrl, $price, $category_id) {
         $sql = "UPDATE Inventory SET name = ?, size = ?, img = ?, price = ? WHERE id = ?";
