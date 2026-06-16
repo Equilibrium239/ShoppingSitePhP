@@ -51,13 +51,22 @@ if (isset($_GET['action'])) {
     }
 }
 
-$cartItems = $cart->getItems();
-$totalPrice = $cart->getTotalPrice();
-$itemsCount = $cart->getItemsCount();
+$cartItems   = $cart->getItems();
+$totalPrice  = $cart->getTotalPrice();
+$itemsCount  = $cart->getItemsCount();
+
+// Fraktzoner från CSV
+$shippingZones = [
+    ['kod' => 'SE_ZON_1',    'namn' => 'Götaland & Svealand (Södra/Mellersta Sverige)', 'avgift' => 79.00,  'fri_frakt' => 999.00],
+    ['kod' => 'SE_ZON_2',    'namn' => 'Nedre Norrland (Kust & Inland)',                'avgift' => 119.00, 'fri_frakt' => 1499.00],
+    ['kod' => 'SE_ZON_3',    'namn' => 'Övre Norrland & Glesbygd',                      'avgift' => 159.00, 'fri_frakt' => 2499.00],
+    ['kod' => 'NO_DK_NORDIC','namn' => 'Danmark & Norge (Grannländer)',                  'avgift' => 249.00, 'fri_frakt' => 3500.00],
+    ['kod' => 'EU_ZON_1',    'namn' => 'Europa Standard (Tyskland, Benelux, Frankrike)', 'avgift' => 299.00, 'fri_frakt' => 5000.00],
+];
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <title>Shopping Cart</title>
@@ -72,6 +81,15 @@ $itemsCount = $cart->getItemsCount();
         .total { font-weight: bold; font-size: 1.2rem; text-align: right; margin-top: 20px; }
         .empty-msg { text-align: center; color: #888; }
         .back-link { display: block; text-align: center; margin-top: 20px; color: #333; }
+
+        /* Frakt-sektion */
+        .shipping-section { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+        .shipping-section label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
+        .shipping-section select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.9rem; background: white; cursor: pointer; }
+        .shipping-cost-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; color: #555; }
+        .free-shipping-notice { color: #4CAF50; font-size: 0.82rem; margin-top: 6px; }
+        .divider { border: none; border-top: 1px solid #eee; margin: 15px 0; }
+        .grand-total { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -104,9 +122,40 @@ $itemsCount = $cart->getItemsCount();
             <?php endforeach; ?>
         </div>
 
-        <div class="total">Total: <span id="total-price"><?php echo $totalPrice; ?></span> USD</div>
+        <div class="total">Delsumma: <span id="total-price"><?php echo $totalPrice; ?></span> USD</div>
 
-        <a href="Checkout.php" style="display: block; text-align: center; padding: 15px; background: #222; color: white; border-radius: 8px; margin-top: 20px; font-weight: 600; text-decoration: none;">
+        <!-- Fraktsektion -->
+        <div class="shipping-section">
+            <label for="shipping-zone">Välj leveranszon</label>
+            <select id="shipping-zone" onchange="updateShipping()">
+                <option value="" data-cost="0" data-fri="0">— Välj zon —</option>
+                <?php foreach ($shippingZones as $zon): ?>
+                    <option
+                        value="<?php echo $zon['kod']; ?>"
+                        data-cost="<?php echo $zon['avgift']; ?>"
+                        data-fri="<?php echo $zon['fri_frakt']; ?>"
+                    >
+                        <?php echo htmlspecialchars($zon['namn']); ?> — <?php echo number_format($zon['avgift'], 2); ?> USD
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <div class="shipping-cost-row">
+                <span>Frakt</span>
+                <span id="shipping-cost-display">— USD</span>
+            </div>
+            <div id="free-shipping-notice" class="free-shipping-notice" style="display:none;"></div>
+        </div>
+
+        <hr class="divider">
+        <div class="grand-total">
+            <span>Totalt</span>
+            <span id="grand-total-display">— USD</span>
+        </div>
+
+        <a href="Checkout.php?zone=<?php /* skickas via JS */ ?>"
+           id="checkout-btn"
+           style="display: block; text-align: center; padding: 15px; background: #222; color: white; border-radius: 8px; margin-top: 20px; font-weight: 600; text-decoration: none;">
             Go to Checkout
         </a>
 
@@ -116,27 +165,66 @@ $itemsCount = $cart->getItemsCount();
 </div>
 
 <script>
+// Baspris från PHP (uppdateras vid add/remove)
+let baseTotal = <?php echo json_encode((float)$totalPrice); ?>;
+
+function updateShipping() {
+    const select = document.getElementById('shipping-zone');
+    const chosen = select.options[select.selectedIndex];
+    const cost   = parseFloat(chosen.dataset.cost) || 0;
+    const friGrans = parseFloat(chosen.dataset.fri) || 0;
+
+    const isFree = friGrans > 0 && baseTotal >= friGrans;
+    const actualCost = isFree ? 0 : cost;
+    const grandTotal = baseTotal + actualCost;
+
+    document.getElementById('shipping-cost-display').textContent =
+        select.value === '' ? '— USD' : actualCost.toFixed(2) + ' USD';
+
+    const notice = document.getElementById('free-shipping-notice');
+    if (select.value === '') {
+        notice.style.display = 'none';
+    } else if (isFree) {
+        notice.textContent = '✓ Fri frakt uppnådd!';
+        notice.style.display = 'block';
+    } else {
+        const kvar = (friGrans - baseTotal).toFixed(2);
+        notice.textContent = `Handla för ${kvar} USD mer för fri frakt`;
+        notice.style.display = 'block';
+    }
+
+    document.getElementById('grand-total-display').textContent =
+        select.value === '' ? '— USD' : grandTotal.toFixed(2) + ' USD';
+
+    // Uppdatera checkout-länken med vald zon
+    const btn = document.getElementById('checkout-btn');
+    if (select.value) {
+        btn.href = `Checkout.php?zone=${encodeURIComponent(select.value)}&shipping=${actualCost.toFixed(2)}`;
+    } else {
+        btn.href = 'Checkout.php';
+    }
+}
+
 function cartAction(productId, action) {
     fetch(`/my-app/page/Cart.php?action=${action}&id=${productId}&ajax=1`)
         .then(res => res.json())
         .then(data => {
-
             const cartCounter = document.querySelector('.cart.counter');
-
-            if (cartCounter) {
-                cartCounter.textContent = data.count;
-            }
+            if (cartCounter) cartCounter.textContent = data.count;
 
             document.getElementById('header-count').textContent = data.count;
-            document.getElementById('total-price').textContent = data.total;
+            document.getElementById('total-price').textContent = parseFloat(data.total).toFixed(2);
+
+            // Uppdatera baseTotal och räkna om frakt
+            baseTotal = parseFloat(data.total);
+            updateShipping();
 
             const itemRow = document.getElementById('item-' + productId);
-
             if (data.removed) {
                 itemRow.remove();
             } else {
                 itemRow.querySelector('.item-quantity').textContent = data.quantity;
-                itemRow.querySelector('.item-price').textContent = data.rowPrice;
+                itemRow.querySelector('.item-price').textContent = parseFloat(data.rowPrice).toFixed(2);
             }
 
             if (data.count === 0) {
@@ -145,9 +233,7 @@ function cartAction(productId, action) {
             }
         })
         .catch(err => console.log(err));
-
 }
-
 </script>
 
 </body>
