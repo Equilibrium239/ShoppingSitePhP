@@ -1,8 +1,15 @@
-<?php 
+<?php
 session_start();
 require_once(__DIR__ . '/../Models/Database.php');
 require_once(__DIR__ . '/../Models/CartLogic.php');
 require_once(__DIR__ . '/../Models/CartItem.php');
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+// Load .env so we can pass the publishable key safely to the frontend
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
+
+$stripePublishableKey = $_ENV['STRIPE_PUBLISHABLE_KEY'] ?? '';
 
 $db = new Database();
 $cart = new Cart($db, session_id());
@@ -36,9 +43,7 @@ $shippingName = null;
 
 if (isset($shippingZones[$selectedZone])) {
     $shippingName = $shippingZones[$selectedZone]['namn'];
-    // Validera mot serverns pris, inte URL-parametern
     $shippingCost = $shippingZones[$selectedZone]['avgift'];
-    // Kolla fri frakt (samma gränser som i Cart.php)
     $friGranser = [
         'SE_ZON_1'     => 999.00,
         'SE_ZON_2'     => 1499.00,
@@ -53,14 +58,14 @@ if (isset($shippingZones[$selectedZone])) {
 
 $grandTotal = $totalPrice + $shippingCost;
 ?>
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
-
+    <!-- Stripe.js must be loaded directly from Stripe's CDN -->
+    <script src="https://js.stripe.com/v3/"></script>
 <style>
 body {
     font-family: 'Segoe UI', sans-serif;
@@ -97,6 +102,7 @@ body {
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid #fafafa;
+    align-items: center;
 }
 
 .summary-item img {
@@ -178,12 +184,70 @@ body {
     font-size: 0.95rem;
 }
 
+/* Stripe card element container */
+#stripe-card-element {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    margin-top: 4px;
+}
+
+#stripe-card-errors {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    min-height: 20px;
+}
+
 #cardFields {
     margin-top: 20px;
     padding: 20px;
     background: #fafafa;
     border-radius: 10px;
     border: 1px solid #eee;
+}
+
+/* Currency conversion block */
+.currency-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.currency-box label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.currency-box select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    cursor: pointer;
+}
+
+#converted-price-display {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #333;
+    min-height: 24px;
+}
+
+#converted-price-display .converted-amount {
+    font-weight: 700;
+    color: #007bff;
+}
+
+#converted-price-display .currency-error {
+    color: #dc2626;
+    font-size: 0.85rem;
 }
 
 .btn-pay {
@@ -218,175 +282,314 @@ body {
     text-decoration: none;
 }
 
-.back-to-cart:hover {
-    color: #007bff;
+.back-to-cart:hover { color: #007bff; }
+
+#payment-processing-msg {
+    text-align: center;
+    color: #555;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    display: none;
 }
 
 @media (max-width: 800px) {
-    .checkout-layout {
-        grid-template-columns: 1fr;
-    }
+    .checkout-layout { grid-template-columns: 1fr; }
 }
 </style>
-
 </head>
 <body>
     <?php require_once(__DIR__ . '/../components/Header.php'); ?>
 
-    <form action="../page/process_checkout.php" method="POST">
+    <div class="checkout-layout">
 
-        <!-- Hidden fraktfält till process_checkout.php -->
-        <input type="hidden" name="shipping_zone"  value="<?php echo htmlspecialchars($selectedZone); ?>">
-        <input type="hidden" name="shipping_cost"  value="<?php echo $shippingCost; ?>">
-        <input type="hidden" name="shipping_name"  value="<?php echo htmlspecialchars($shippingName ?? ''); ?>">
-        <input type="hidden" name="grand_total"    value="<?php echo $grandTotal; ?>">
+        <!-- LEFT: Delivery + Payment -->
+        <div class="checkout-box">
 
-        <div class="checkout-layout">
+            <h2>Delivery Information</h2>
 
-            <!-- Vänster: Leveransinformation & betalning -->
-            <div class="checkout-box">
-
-                <h2>Delivery Information</h2>
-
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" name="fullName" placeholder="John Doe" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" name="address" placeholder="123 Main Street" required>
-                </div>
-
-                <div style="display:flex; gap:10px;">
-                    <div class="form-group" style="flex:1;">
-                        <label>Postnumber</label>
-                        <input type="text" name="zip" placeholder="123 45" required>
-                    </div>
-                    <div class="form-group" style="flex:2;">
-                        <label>City</label>
-                        <input type="text" name="city" placeholder="Stockholm" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Payment Method</label>
-                    <select name="paymentMethod" id="paymentMethod" onchange="toggleCardFields()">
-                        <option value="card">Card (Visa/Mastercard)</option>
-                        <option value="paypal">PayPal</option>
-                    </select>
-                </div>
-
-                <div id="cardFields">
-                    <div class="form-group">
-                        <label>Card Number</label>
-                        <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456">
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        <div class="form-group" style="flex:1;">
-                            <label>Expiry Date</label>
-                            <input type="text" name="expiry" placeholder="MM/YY">
-                        </div>
-                        <div class="form-group" style="flex:1;">
-                            <label>CVV</label>
-                            <input type="text" name="cvv" placeholder="123">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Name on Card</label>
-                        <input type="text" name="cardName" placeholder="John Doe">
-                    </div>
-                </div>
-
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="fullName" placeholder="John Doe" required>
             </div>
 
-            <!-- Höger: Ordersammanfattning -->
-            <div class="checkout-box">
-
-                <h2>Your order</h2>
-
-                <?php foreach ($checkout_items as $item): ?>
-                    <div class="summary-item">
-                        <div style="display:flex; gap:15px; align-items:center;">
-                            <img src="/my-app/image/<?php echo htmlspecialchars($item->imageUrl ?? ''); ?>" alt="">
-                            <div>
-                                <div style="font-weight:600;">
-                                    <?php echo htmlspecialchars($item->productName); ?>
-                                </div>
-                                <div style="font-size:0.8rem; color:#777;">
-                                    Antal: <?php echo $item->quantity; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="font-weight:600; white-space:nowrap;">
-                            <?php echo number_format($item->rowPrice, 2); ?> USD
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-
-                <!-- Delsumma -->
-                <div class="subtotal-row">
-                    <span>Subtotal</span>
-                    <span><?php echo number_format($totalPrice, 2); ?> USD</span>
-                </div>
-
-                <!-- Fraktrad -->
-                <?php if ($shippingName): ?>
-                    <div class="shipping-row">
-                        <span>
-                            Frakt
-                            <br>
-                            <small style="color:#999; font-size:0.78rem;">
-                                <?php echo htmlspecialchars($shippingName); ?>
-                            </small>
-                        </span>
-                        <span style="white-space:nowrap;">
-                            <?php if ($shippingCost > 0): ?>
-                                <?php echo number_format($shippingCost, 2); ?> USD
-                            <?php else: ?>
-                                <span style="color:#2e7d32; font-weight:600;">Gratis</span>
-                                <span class="free-shipping-badge">✓ Fri frakt</span>
-                            <?php endif; ?>
-                        </span>
-                    </div>
-                <?php else: ?>
-                    <div class="no-zone-warning">
-                        ⚠️ Ingen fraktzon vald.<br>
-                        <a href="Cart.php" style="color:#c62828; font-weight:600;">Gå tillbaka och välj fraktzon</a>
-                    </div>
-                <?php endif; ?>
-
-                <!-- Totalpris -->
-                <div class="total-row">
-                    <span>Total</span>
-                    <span><?php echo number_format($grandTotal, 2); ?> USD</span>
-                </div>
-
-                <p style="font-size:0.8rem; color:#999; margin-top:20px; text-align:center;">
-                    30-day money back guarantee.
-                </p>
-
-                <button type="submit" class="btn-pay" <?php echo !$shippingName ? 'disabled' : ''; ?>>
-                    Confirm Purchase
-                </button>
-
-                <?php if (!$shippingName): ?>
-                    <a href="Cart.php" class="back-to-cart">← Tillbaka till kundvagnen för att välja frakt</a>
-                <?php endif; ?>
-
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="address" placeholder="123 Main Street" required>
             </div>
+
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Postnumber</label>
+                    <input type="text" id="zip" placeholder="123 45" required>
+                </div>
+                <div class="form-group" style="flex:2;">
+                    <label>City</label>
+                    <input type="text" id="city" placeholder="Stockholm" required>
+                </div>
+            </div>
+
+            <h2 style="margin-top:30px;">Payment</h2>
+
+            <div id="cardFields">
+                <div class="form-group">
+                    <label>Card Details (test: use 4242 4242 4242 4242)</label>
+                    <!-- Stripe injects a secure iframe here -->
+                    <div id="stripe-card-element"></div>
+                    <div id="stripe-card-errors"></div>
+                </div>
+            </div>
+
+            <button id="btn-pay" class="btn-pay" <?php echo !$shippingName ? 'disabled' : ''; ?>>
+                Confirm Purchase — <?php echo number_format($grandTotal, 2); ?> SEK
+            </button>
+            <p id="payment-processing-msg">Processing payment, please wait…</p>
+
+            <?php if (!$shippingName): ?>
+                <a href="Cart.php" class="back-to-cart">← Back to cart to select shipping</a>
+            <?php endif; ?>
 
         </div>
 
-    </form>
+        <!-- RIGHT: Order summary -->
+        <div class="checkout-box">
+
+            <h2>Your Order</h2>
+
+            <?php foreach ($checkout_items as $item): ?>
+                <div class="summary-item">
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <img src="/my-app/image/<?php echo htmlspecialchars($item->imageUrl ?? ''); ?>" alt="">
+                        <div>
+                            <div style="font-weight:600;">
+                                <?php echo htmlspecialchars($item->productName); ?>
+                            </div>
+                            <div style="font-size:0.8rem; color:#777;">
+                                Antal: <?php echo $item->quantity; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-weight:600; white-space:nowrap;">
+                        <?php echo number_format($item->rowPrice, 2); ?> SEK
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="subtotal-row">
+                <span>Subtotal</span>
+                <span><?php echo number_format($totalPrice, 2); ?> SEK</span>
+            </div>
+
+            <?php if ($shippingName): ?>
+                <div class="shipping-row">
+                    <span>
+                        Frakt<br>
+                        <small style="color:#999; font-size:0.78rem;">
+                            <?php echo htmlspecialchars($shippingName); ?>
+                        </small>
+                    </span>
+                    <span style="white-space:nowrap;">
+                        <?php if ($shippingCost > 0): ?>
+                            <?php echo number_format($shippingCost, 2); ?> SEK
+                        <?php else: ?>
+                            <span style="color:#2e7d32; font-weight:600;">Gratis</span>
+                            <span class="free-shipping-badge">✓ Fri frakt</span>
+                        <?php endif; ?>
+                    </span>
+                </div>
+            <?php else: ?>
+                <div class="no-zone-warning">
+                    ⚠️ Ingen fraktzon vald.<br>
+                    <a href="Cart.php" style="color:#c62828; font-weight:600;">Gå tillbaka och välj fraktzon</a>
+                </div>
+            <?php endif; ?>
+
+            <div class="total-row">
+                <span>Total</span>
+                <span><?php echo number_format($grandTotal, 2); ?> SEK</span>
+            </div>
+
+            <!-- ── Currency Conversion ── -->
+            <div class="currency-box">
+                <label for="currency-select">See total in another currency:</label>
+                <select id="currency-select">
+                    <option value="">-- Select currency --</option>
+                    <option value="EUR">EUR — Euro</option>
+                    <option value="USD">USD — US Dollar</option>
+                    <option value="GBP">GBP — British Pound</option>
+                    <option value="DKK">DKK — Danish Krone</option>
+                    <option value="NOK">NOK — Norwegian Krone</option>
+                </select>
+                <div id="converted-price-display"></div>
+            </div>
+
+            <p style="font-size:0.8rem; color:#999; margin-top:20px; text-align:center;">
+                30-day money back guarantee. Payment processed securely by Stripe.
+            </p>
+
+        </div>
+
+    </div>
 
     <?php require_once(__DIR__ . '/../components/footer.php'); ?>
 
 <script>
-function toggleCardFields() {
-    const method = document.getElementById('paymentMethod').value;
-    document.getElementById('cardFields').style.display = method === 'card' ? 'block' : 'none';
+// ── Stripe setup ──────────────────────────────────────────────────────────────
+const STRIPE_PUBLISHABLE_KEY = <?php echo json_encode($stripePublishableKey); ?>;
+const GRAND_TOTAL_SEK = <?php echo json_encode((float)$grandTotal); ?>;
+
+const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+const elements = stripe.elements();
+
+const cardElement = elements.create('card', {
+    style: {
+        base: {
+            fontSize: '16px',
+            fontFamily: "'Segoe UI', sans-serif",
+            color: '#333',
+            '::placeholder': { color: '#aaa' }
+        },
+        invalid: { color: '#dc2626' }
+    }
+});
+cardElement.mount('#stripe-card-element');
+
+// Show validation errors live as the user types
+cardElement.on('change', (event) => {
+    const errorEl = document.getElementById('stripe-card-errors');
+    errorEl.textContent = event.error ? event.error.message : '';
+});
+
+// ── Pay button ────────────────────────────────────────────────────────────────
+document.getElementById('btn-pay').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-pay');
+    const msgEl = document.getElementById('payment-processing-msg');
+    const errorEl = document.getElementById('stripe-card-errors');
+
+    // Basic delivery field validation
+    const fullName = document.getElementById('fullName').value.trim();
+    const address  = document.getElementById('address').value.trim();
+    const zip      = document.getElementById('zip').value.trim();
+    const city     = document.getElementById('city').value.trim();
+
+    if (!fullName || !address || !zip || !city) {
+        errorEl.textContent = 'Please fill in all delivery fields.';
+        return;
+    }
+
+    btn.disabled = true;
+    msgEl.style.display = 'block';
+    errorEl.textContent = '';
+
+    try {
+        // 1. Create a PaymentIntent on the server
+        const response = await fetch('/my-app/rest/create_payment_intent.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: GRAND_TOTAL_SEK })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            errorEl.textContent = data.error;
+            btn.disabled = false;
+            msgEl.style.display = 'none';
+            return;
+        }
+
+        // 2. Confirm the payment with Stripe
+        const { error, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+            payment_method: {
+                card: cardElement,
+                billing_details: { name: fullName }
+            }
+        });
+
+        if (error) {
+            errorEl.textContent = error.message;
+            btn.disabled = false;
+            msgEl.style.display = 'none';
+            return;
+        }
+
+        if (paymentIntent.status === 'succeeded') {
+            // Payment confirmed — redirect to success page
+            window.location.href = '/my-app/page/order_success.php?pi=' + paymentIntent.id;
+        }
+
+    } catch (err) {
+        errorEl.textContent = 'An unexpected error occurred. Please try again.';
+        console.error(err);
+        btn.disabled = false;
+        msgEl.style.display = 'none';
+    }
+});
+
+// ── Currency Conversion ───────────────────────────────────────────────────────
+// Open Exchange Rates — free plan base currency is always USD.
+// Formula: targetAmount = (SEK_total / rates.SEK) * rates.TARGET
+const OER_APP_ID = 'REPLACE_WITH_YOUR_OPEN_EXCHANGE_RATES_APP_ID';
+const displayEl  = document.getElementById('converted-price-display');
+let cachedRates  = null; // cache so we don't re-fetch on every dropdown change
+
+const currencySymbols = {
+    EUR: '€', USD: '$', GBP: '£', DKK: 'kr', NOK: 'kr'
+};
+
+async function fetchRates() {
+    if (cachedRates) return cachedRates;
+
+    const res = await fetch(`https://openexchangerates.org/api/latest.json?app_id=${OER_APP_ID}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    if (json.error) throw new Error(json.description || 'API error');
+    cachedRates = json.rates;
+    return cachedRates;
 }
+
+function convertSEK(rates, targetCurrency) {
+    // rates are relative to USD base
+    // SEK → USD → target
+    const amountInUSD = GRAND_TOTAL_SEK / rates['SEK'];
+    return amountInUSD * rates[targetCurrency];
+}
+
+async function updateConvertedPrice() {
+    const select = document.getElementById('currency-select');
+    const target = select.value;
+
+    if (!target) {
+        displayEl.innerHTML = '';
+        return;
+    }
+
+    displayEl.innerHTML = '<span style="color:#999; font-size:0.85rem;">Loading…</span>';
+
+    try {
+        const rates = await fetchRates();
+
+        if (!rates[target]) {
+            throw new Error(`Currency ${target} not found in API response`);
+        }
+
+        const converted = convertSEK(rates, target);
+        const symbol    = currencySymbols[target] || target;
+        const formatted = new Intl.NumberFormat('sv-SE', {
+            minimumFractionDigits: 2, maximumFractionDigits: 2
+        }).format(converted);
+
+        displayEl.innerHTML =
+            `≈ <span class="converted-amount">${symbol} ${formatted} ${target}</span>
+             <span style="font-size:0.75rem; color:#999; margin-left:4px;">(live rate)</span>`;
+
+    } catch (err) {
+        console.error('Currency conversion failed:', err);
+        displayEl.innerHTML =
+            '<span class="currency-error">⚠️ Currency conversion temporarily unavailable.</span>';
+    }
+}
+
+document.getElementById('currency-select').addEventListener('change', updateConvertedPrice);
 </script>
 
 </body>

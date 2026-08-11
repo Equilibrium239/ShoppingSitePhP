@@ -188,7 +188,8 @@ class Database {
 
     if ($userId) {
         $stmt = $this->pdo->prepare("
-            SELECT ci.*, i.name AS productName, i.price AS productPrice, (i.price * ci.quantity) AS rowPrice
+            SELECT ci.*, i.name AS productName, i.price AS productPrice,
+                   (i.price * ci.quantity) AS rowPrice, i.imageUrl
             FROM CartItem ci
             JOIN Inventory i ON ci.productId = i.id
             WHERE ci.userId = ?
@@ -196,7 +197,8 @@ class Database {
         $stmt->execute([$userId]);
     } else {
         $stmt = $this->pdo->prepare("
-            SELECT ci.*, i.name AS productName, i.price AS productPrice, (i.price * ci.quantity) AS rowPrice
+            SELECT ci.*, i.name AS productName, i.price AS productPrice,
+                   (i.price * ci.quantity) AS rowPrice, i.imageUrl
             FROM CartItem ci
             JOIN Inventory i ON ci.productId = i.id
             WHERE ci.sessionId = ?
@@ -212,6 +214,7 @@ class Database {
         $item->productName = $row['productName'];
         $item->productPrice = $row['productPrice'];
         $item->rowPrice = $row['rowPrice'];
+        $item->imageUrl = $row['imageUrl'];
         $cartItems[] = $item;
     }
 
@@ -235,6 +238,16 @@ public function updateCartItem($userId, $session_id, $productId, $quantity) {
 public function convertSessionToUser($session_id, $userId, $newSessionId) {
     $stmt = $this->pdo->prepare("UPDATE CartItem SET userId = ?, sessionId = ? WHERE sessionId = ?");
     $stmt->execute([$userId, $newSessionId, $session_id]);
+}
+
+public function clearCartItems($userId, $session_id) {
+    if ($userId) {
+        $stmt = $this->pdo->prepare("DELETE FROM CartItem WHERE userId = ?");
+        $stmt->execute([$userId]);
+    } else {
+        $stmt = $this->pdo->prepare("DELETE FROM CartItem WHERE sessionId = ?");
+        $stmt->execute([$session_id]);
+    }
 }
 
 }
