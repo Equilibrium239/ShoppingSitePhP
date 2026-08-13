@@ -340,7 +340,7 @@ body {
             </div>
 
             <button id="btn-pay" class="btn-pay" <?php echo !$shippingName ? 'disabled' : ''; ?>>
-                Confirm Purchase — <?php echo number_format($grandTotal, 2); ?> SEK
+                Confirm Purchase — $<?php echo number_format($grandTotal, 2); ?>
             </button>
             <p id="payment-processing-msg">Processing payment, please wait…</p>
 
@@ -369,14 +369,14 @@ body {
                         </div>
                     </div>
                     <div style="font-weight:600; white-space:nowrap;">
-                        <?php echo number_format($item->rowPrice, 2); ?> SEK
+                        $<?php echo number_format($item->rowPrice, 2); ?>
                     </div>
                 </div>
             <?php endforeach; ?>
 
             <div class="subtotal-row">
                 <span>Subtotal</span>
-                <span><?php echo number_format($totalPrice, 2); ?> SEK</span>
+                <span>$<?php echo number_format($totalPrice, 2); ?></span>
             </div>
 
             <?php if ($shippingName): ?>
@@ -389,7 +389,7 @@ body {
                     </span>
                     <span style="white-space:nowrap;">
                         <?php if ($shippingCost > 0): ?>
-                            <?php echo number_format($shippingCost, 2); ?> SEK
+                            $<?php echo number_format($shippingCost, 2); ?>
                         <?php else: ?>
                             <span style="color:#2e7d32; font-weight:600;">Gratis</span>
                             <span class="free-shipping-badge">✓ Fri frakt</span>
@@ -405,7 +405,7 @@ body {
 
             <div class="total-row">
                 <span>Total</span>
-                <span><?php echo number_format($grandTotal, 2); ?> SEK</span>
+                <span>$<?php echo number_format($grandTotal, 2); ?></span>
             </div>
 
             <!-- ── Currency Conversion ── -->
@@ -414,7 +414,7 @@ body {
                 <select id="currency-select">
                     <option value="">-- Select currency --</option>
                     <option value="EUR">EUR — Euro</option>
-                    <option value="USD">USD — US Dollar</option>
+                    <option value="SEK">SEK — Swedish Krona</option>
                     <option value="GBP">GBP — British Pound</option>
                     <option value="DKK">DKK — Danish Krone</option>
                     <option value="NOK">NOK — Norwegian Krone</option>
@@ -435,7 +435,7 @@ body {
 <script>
 // ── Stripe setup ──────────────────────────────────────────────────────────────
 const STRIPE_PUBLISHABLE_KEY = <?php echo json_encode($stripePublishableKey); ?>;
-const GRAND_TOTAL_SEK = <?php echo json_encode((float)$grandTotal); ?>;
+const GRAND_TOTAL_USD = <?php echo json_encode((float)$grandTotal); ?>;
 
 const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 const elements = stripe.elements();
@@ -485,7 +485,7 @@ document.getElementById('btn-pay').addEventListener('click', async () => {
         const response = await fetch('/my-app/rest/create_payment_intent.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: GRAND_TOTAL_SEK })
+            body: JSON.stringify({ amount: GRAND_TOTAL_USD })
         });
 
         const data = await response.json();
@@ -527,13 +527,13 @@ document.getElementById('btn-pay').addEventListener('click', async () => {
 
 // ── Currency Conversion ───────────────────────────────────────────────────────
 // Open Exchange Rates — free plan base currency is always USD.
-// Formula: targetAmount = (SEK_total / rates.SEK) * rates.TARGET
-const OER_APP_ID = 'REPLACE_WITH_YOUR_OPEN_EXCHANGE_RATES_APP_ID';
+// Formula: Since our prices are in USD, conversion is simple: USD * rates.TARGET
+const OER_APP_ID = '0d7347c49e0b4e269dea5344c2450031';
 const displayEl  = document.getElementById('converted-price-display');
 let cachedRates  = null; // cache so we don't re-fetch on every dropdown change
 
 const currencySymbols = {
-    EUR: '€', USD: '$', GBP: '£', DKK: 'kr', NOK: 'kr'
+    EUR: '€', USD: '$', GBP: '£', DKK: 'kr', NOK: 'kr', SEK: 'kr'
 };
 
 async function fetchRates() {
@@ -547,11 +547,10 @@ async function fetchRates() {
     return cachedRates;
 }
 
-function convertSEK(rates, targetCurrency) {
-    // rates are relative to USD base
-    // SEK → USD → target
-    const amountInUSD = GRAND_TOTAL_SEK / rates['SEK'];
-    return amountInUSD * rates[targetCurrency];
+function convertUSD(rates, targetCurrency) {
+    // Prices are in USD, rates are relative to USD base
+    // USD → target is simple multiplication
+    return GRAND_TOTAL_USD * rates[targetCurrency];
 }
 
 async function updateConvertedPrice() {
@@ -572,7 +571,7 @@ async function updateConvertedPrice() {
             throw new Error(`Currency ${target} not found in API response`);
         }
 
-        const converted = convertSEK(rates, target);
+        const converted = convertUSD(rates, target);
         const symbol    = currencySymbols[target] || target;
         const formatted = new Intl.NumberFormat('sv-SE', {
             minimumFractionDigits: 2, maximumFractionDigits: 2

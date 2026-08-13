@@ -21,7 +21,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
       <g:id><?php echo htmlspecialchars((string)$product['id'], ENT_XML1, 'UTF-8'); ?></g:id>
       <g:title><?php echo htmlspecialchars($product['name'], ENT_XML1, 'UTF-8'); ?></g:title>
       <g:description><?php echo htmlspecialchars($product['description'] ?? '', ENT_XML1, 'UTF-8'); ?></g:description>
-      <g:price><?php echo htmlspecialchars(number_format((float)$product['price'], 2, '.', ''), ENT_XML1, 'UTF-8'); ?> SEK</g:price>
+      <g:price><?php echo htmlspecialchars(number_format((float)$product['price'], 2, '.', ''), ENT_XML1, 'UTF-8'); ?> USD</g:price>
       <g:link>http://localhost:8080/my-app/page/Product.php?id=<?php echo (int)$product['id']; ?></g:link>
       <g:image_link>http://localhost:8080/my-app/image/<?php echo htmlspecialchars($product['imageUrl'] ?? '', ENT_XML1, 'UTF-8'); ?></g:image_link>
       <g:condition>new</g:condition>

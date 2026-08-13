@@ -10,6 +10,4 @@ class CartItem {
     public $rowPrice;
     public $imageUrl;
     public $price;
-};
-
-?>
+}

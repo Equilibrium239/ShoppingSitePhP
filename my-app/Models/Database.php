@@ -10,6 +10,9 @@ class Database {
     private $usersDatabase;
 
     function getUsersDatabase(){
+        if (!$this->usersDatabase) {
+            $this->usersDatabase = new UserDatabase($this->pdo);
+        }
         return $this->usersDatabase;
     }        
 
@@ -30,8 +33,6 @@ class Database {
         try {
             $this->pdo = new PDO($dsn, $user, $pass);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            $this->usersDatabase = new UserDatabase($this->pdo);
         } catch (PDOException $e) {
             die("Anslutning misslyckades: " . $e->getMessage());
         }
@@ -251,4 +252,3 @@ public function clearCartItems($userId, $session_id) {
 }
 
 }
-?>

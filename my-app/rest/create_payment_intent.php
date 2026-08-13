@@ -29,10 +29,10 @@ if (!isset($data['amount']) || !is_numeric($data['amount'])) {
     exit;
 }
 
-// Amount arrives as SEK (e.g. 1299.00). Stripe wants the smallest unit (öre = cents).
-$amountInOre = (int) round((float)$data['amount'] * 100);
+// Amount arrives as USD (e.g. 129.99). Stripe wants the smallest unit (cents).
+$amountInCents = (int) round((float)$data['amount'] * 100);
 
-if ($amountInOre < 100) { // Stripe minimum is 1.00 SEK
+if ($amountInCents < 50) { // Stripe minimum is $0.50 USD
     http_response_code(400);
     echo json_encode(['error' => 'Amount too small']);
     exit;
@@ -50,8 +50,8 @@ if (empty($secretKey) || str_starts_with($secretKey, 'sk_test_REPLACE')) {
 
 try {
     $paymentIntent = \Stripe\PaymentIntent::create([
-        'amount'   => $amountInOre,
-        'currency' => 'sek',
+        'amount'   => $amountInCents,
+        'currency' => 'usd',
         'automatic_payment_methods' => ['enabled' => true],
     ]);
 

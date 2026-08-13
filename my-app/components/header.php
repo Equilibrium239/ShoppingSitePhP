@@ -1,4 +1,8 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once(__DIR__ . '/../Models/Database.php');
 require_once(__DIR__ . '/../Models/CartLogic.php');
 require_once(__DIR__ . '/../Models/CartItem.php');
@@ -6,6 +10,17 @@ require_once(__DIR__ . '/../Models/CartItem.php');
 $database = new Database();
 $cart = new Cart($database, session_id());
 $cartCount = $cart->getItemsCount();
+
+// Check if user is logged in
+$auth = $database->getUsersDatabase()->getAuth();
+$isLoggedIn = $auth->isLoggedIn();
+$userEmail = '';
+$userInitial = '';
+
+if ($isLoggedIn) {
+    $userEmail = $auth->getEmail();
+    $userInitial = strtoupper(substr($userEmail, 0, 1)); // First letter, uppercase
+}
 ?>
 
 <header class="main-header">
@@ -55,16 +70,57 @@ $cartCount = $cart->getItemsCount();
                 </a>
             </li>
 
-            <li>
-                <a href="/my-app/page/Medlemskap.php">
-                    <button class="Btn" style="margin: 0;">
-                        Medlem
-                    </button>
-                </a>
-            </li>
+            <?php if ($isLoggedIn): ?>
+                <!-- User is logged in: show bubble + logout -->
+                <li>
+                    <div class="user-bubble" title="<?php echo htmlspecialchars($userEmail); ?>">
+                        <?php echo $userInitial; ?>
+                    </div>
+                </li>
+                <li>
+                    <a href="/my-app/page/logout.php">
+                        <button class="Btn" style="margin: 0; background: #dc2626;">
+                            Logga ut
+                        </button>
+                    </a>
+                </li>
+            <?php else: ?>
+                <!-- User is NOT logged in: show Medlem button -->
+                <li>
+                    <a href="/my-app/page/Medlemskap.php">
+                        <button class="Btn" style="margin: 0;">
+                            Medlem
+                        </button>
+                    </a>
+                </li>
+            <?php endif; ?>
 
         </ul>
 
     </nav>
 
 </header>
+
+<style>
+/* User bubble styling (like Webhallen) */
+.user-bubble {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-bubble:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+</style>
