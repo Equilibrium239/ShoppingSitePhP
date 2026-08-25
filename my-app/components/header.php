@@ -7,7 +7,14 @@ require_once(__DIR__ . '/../Models/Database.php');
 require_once(__DIR__ . '/../Models/CartLogic.php');
 require_once(__DIR__ . '/../Models/CartItem.php');
 
-$database = new Database();
+// Reuse an existing $db instance if the including page already created one,
+// otherwise create a new one. This prevents a second Auth instantiation which
+// would try to send headers after HTML output has already started.
+if (!isset($db)) {
+    $db = new Database();
+}
+$database = $db;
+
 $cart = new Cart($database, session_id());
 $cartCount = $cart->getItemsCount();
 

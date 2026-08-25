@@ -50,6 +50,7 @@
         display: flex;
         flex-direction: column;
         border: 1px solid white;
+        cursor: pointer;
     }
 
     .product-card:hover {
@@ -180,24 +181,20 @@ function addToCart(productId, btn) {
         <div class="product-grid">
     <?php 
       foreach ($my_products as $product): ?>
-        <div class="product-card">
+        <div class="product-card" onclick="window.location='/my-app/page/Product.php?id=<?php echo $product['id']; ?>'">
             <div class="product-image">
-                <img src="/my-app/image/<?php echo $product['imageUrl']; ?>" alt="<?php echo $product['name']; ?>">
+                <img src="/my-app/image/<?php echo $product['imageUrl']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
             </div>
             <div class="product-info">
               <span class="category-badge" style="font-size: 0.7rem; text-transform: uppercase; color: #888;">
                 <?php echo htmlspecialchars($product['category_name'] ?? 'Ingen kategori'); ?>
                </span>
 
-            <h3>
-                <a href="Product.php?id=<?php echo $product['id']; ?>">
-                    <?php echo htmlspecialchars($product['name']); ?>
-                </a>
-            </h3>
-                <p class="description" style="font-size: 0.8rem; color: #666;"><?php echo $product['description']; ?></p>
-                <p class="size">Storlek: <?php echo $product['size']; ?></p>
+            <h3><?php echo htmlspecialchars($product['name']); ?></h3>
+                <p class="description" style="font-size: 0.8rem; color: #666;"><?php echo htmlspecialchars($product['description']); ?></p>
+                <p class="size">Storlek: <?php echo htmlspecialchars($product['size']); ?></p>
                 <p class="price"><?php echo $product['price']; ?> USD</p>
-               <button class="BtnCloths" onclick="addToCart(<?php echo $product['id']; ?>, this)">
+               <button class="BtnCloths" onclick="event.stopPropagation(); addToCart(<?php echo $product['id']; ?>, this)">
                     Add to Cart
                 </button>
             </div>

@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once(__DIR__ . '/../Models/Database.php');
 require_once(__DIR__ . '/../Models/CartLogic.php');
 require_once(__DIR__ . '/../Models/CartItem.php');
@@ -9,9 +8,13 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
 
+// Initialize auth BEFORE any HTML output — delight-im/auth calls session_start()
+// internally which sets headers; doing it here prevents "headers already sent" errors.
+$db = new Database();
+$db->getUsersDatabase()->getAuth();
+
 $stripePublishableKey = $_ENV['STRIPE_PUBLISHABLE_KEY'] ?? '';
 
-$db = new Database();
 $cart = new Cart($db, session_id());
 $cartItems = $cart->getItems();
 
